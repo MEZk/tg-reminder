@@ -1,0 +1,21 @@
+services:
+  tg-reminder:
+    image: mezk/tg-reminder:latest
+    hostname: tg-reminder
+    restart: always
+    container_name: tg-reminder
+    # Allow colorized output
+    tty: true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    environment:
+      - TELEGRAM_APITOKEN=${TELEGRAM_APITOKEN}
+      - DEBUG=true
+      - DB_FILE=/srv/db/data/tg-reminder.db
+      - MIGRATIONS=/srv/db/migrations
+    volumes:
+      - ./var/tg-reminder:/srv/db/data # mount volume with db file
+      - ./migrations:/srv/db/migrations # mount volume with db migration files
