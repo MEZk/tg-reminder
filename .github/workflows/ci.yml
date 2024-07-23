@@ -41,7 +41,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59.1
-          args: --new-from-rev=origin/master --config=.golangci.pipeline.yaml --sort-results --max-issues-per-linter=1000 --max-same-issues=1000 ./...
+          args: --new-from-rev=origin/master --config=.golangci.yml --sort-results --max-issues-per-linter=1000 --max-same-issues=1000 ./...
 
       - name: set up QEMU
         uses: docker/setup-qemu-action@v3
