@@ -1,0 +1,9 @@
+*.test
+*.out
+go.work
+bin
+.idea
+logs/
+var
+dist/
+.DS_Store
