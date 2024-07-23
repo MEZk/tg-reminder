@@ -39,7 +39,7 @@ jobs:
 
       - name: race test
         run: |
-          make test-race
+          make race-test
         env:
           TZ: "UTC"
 
