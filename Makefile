@@ -72,7 +72,7 @@ mocks:
 lint:
 	$(GOLANGCI_BIN) run \
      --new-from-rev=origin/master \
-     --config=.golangci.pipeline.yaml \
+     --config=.golangci.yml \
      --sort-results \
      --max-issues-per-linter=1000 \
      --max-same-issues=1000 \
