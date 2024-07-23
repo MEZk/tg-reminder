@@ -28,10 +28,14 @@ jobs:
       - name: build
         run: |
           make build
+        env:
+          TZ: "UTC"
 
       - name: test
         run: |
           make test
+        env:
+          TZ: "UTC"
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
