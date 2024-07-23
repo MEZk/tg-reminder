@@ -26,20 +26,17 @@ jobs:
         id: go
 
       - name: build
-        run: |
-          make build
+        run: make build
         env:
           TZ: "UTC"
 
       - name: test
-        run: |
-          make test
+        run: make test
         env:
           TZ: "UTC"
 
       - name: race test
-        run: |
-          make race-test
+        run: make race-test
         env:
           TZ: "UTC"
 
