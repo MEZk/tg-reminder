@@ -25,7 +25,7 @@ race-test:
 
 build:
 	mkdir -p bin
-	cd cmd/bot && go build -ldflags "-X main.revision=$(REV) -s -w" -o ../bin/tg-reminder.$(BRANCH)
+	cd cmd/bot && go build -ldflags "-X main.revision=$(REV) -s -w" -o ../../bin/tg-reminder.$(BRANCH)
 	cp bin/tg-reminder.$(BRANCH) bin/tg-reminder
 
 release:
