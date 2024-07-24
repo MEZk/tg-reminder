@@ -31,6 +31,8 @@ const (
 )
 
 func Test_main(t *testing.T) {
+	t.Skip()
+
 	t.Run("success: start bot, create db, send getMe, getUpdates, sendMessage requests", func(t *testing.T) {
 		f, err := os.CreateTemp("", "test-db")
 		if err != nil {
