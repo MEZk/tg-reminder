@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	envDbFile                 = "DB_FILE"                   // database file path
+	envDBFile                 = "DB_FILE"                   // database file path
 	envMigrations             = "MIGRATIONS"                // migration folders for goose
 	envDebug                  = "DEBUG"                     // whether to print debug logs
 	envTelegramAPIToken       = "TELEGRAM_APITOKEN"         // Telegram API token, received from Botfather
@@ -32,7 +32,7 @@ var revision = "local"
 func main() {
 	fmt.Printf("tg-reminder %s\n", revision)
 
-	dbFile := os.Getenv(envDbFile)
+	dbFile := os.Getenv(envDBFile)
 	migrationsFolder := os.Getenv(envMigrations)
 
 	debug, err := strconv.ParseBool(os.Getenv(envDebug))
@@ -92,8 +92,7 @@ func execute(ctx context.Context, dbFile, migrationsFolder, tgAPIToken string, d
 	}()
 
 	// Listen is a blocking call
-	tgUpdatesListener.Listen(ctx)
-	return nil
+	return tgUpdatesListener.Listen(ctx)
 }
 
 func setupLog(dbg bool, secrets ...string) {
@@ -118,5 +117,7 @@ func setupLog(dbg bool, secrets ...string) {
 
 	log.SetupStdLogger(logOpts...)
 	log.Setup(logOpts...)
-	tbapi.SetLogger(log.ToStdLogger(log.Default(), "DEBUG tbapi ----"))
+	if err := tbapi.SetLogger(log.ToStdLogger(log.Default(), "DEBUG tbapi ----")); err != nil {
+		panic(err)
+	}
 }

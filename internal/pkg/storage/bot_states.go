@@ -11,11 +11,14 @@ import (
 )
 
 var (
-	ErrBotStateNotFound      = errors.New("bot state is not found")
+	// ErrBotStateNotFound - bot state is not found.
+	ErrBotStateNotFound = errors.New("bot state is not found")
+	// ErrBotStateAlreadyExists - bot state is already exists.
 	ErrBotStateAlreadyExists = errors.New("bot state already exists")
 )
 
-func (s *storage) SaveBotState(ctx context.Context, state domain.BotState) error {
+// SaveBotState - saves bot state.
+func (s *Storage) SaveBotState(ctx context.Context, state domain.BotState) error {
 	if state.ModifiedAt.IsZero() {
 		state.ModifiedAt = timeNowUTC()
 	}
@@ -40,7 +43,8 @@ func (s *storage) SaveBotState(ctx context.Context, state domain.BotState) error
 	return nil
 }
 
-func (s *storage) GetBotState(ctx context.Context, userID int64) (domain.BotState, error) {
+// GetBotState - returns bot state by user id.
+func (s *Storage) GetBotState(ctx context.Context, userID int64) (domain.BotState, error) {
 	const query = `
 		SELECT
 		    user_id

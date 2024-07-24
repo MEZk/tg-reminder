@@ -47,7 +47,7 @@ func Test_main(t *testing.T) {
 		t.Setenv(envMigrations, migrationsFolder)
 		t.Setenv(envDebug, "false")
 		t.Setenv(envTelegramAPIToken, testApiToken)
-		t.Setenv(envDbFile, dbFilename)
+		t.Setenv(envDBFile, dbFilename)
 
 		var (
 			withUpdates        atomic.Bool

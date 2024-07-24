@@ -13,7 +13,7 @@ const testDB = "bot_test.db"
 type storageTestSuite struct {
 	suite.Suite
 	dbPath  string
-	storage *storage
+	storage *Storage
 }
 
 func Test_StorageTestSuite(t *testing.T) {

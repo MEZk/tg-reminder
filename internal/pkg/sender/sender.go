@@ -14,17 +14,18 @@ type BotAPI interface {
 	Send(c tbapi.Chattable) (tbapi.Message, error)
 }
 
-type botResponseSender struct {
+// BotResponseSender - sender which is able to send bot response to user.
+type BotResponseSender struct {
 	botAPI BotAPI
 }
 
-// New creates a sender of Telegram's bot responses.
-func New(botAPI BotAPI) *botResponseSender {
-	return &botResponseSender{botAPI: botAPI}
+// New - creates a sender of Telegram's bot responses.
+func New(botAPI BotAPI) *BotResponseSender {
+	return &BotResponseSender{botAPI: botAPI}
 }
 
-// Send sends a message to telegram as markdown first and if failed - as plain text.
-func (s *botResponseSender) SendBotResponse(resp BotResponse, opts ...BotResponseOption) error {
+// SendBotResponse - sends a message to telegram as markdown first and if failed - as plain text.
+func (s *BotResponseSender) SendBotResponse(resp BotResponse, opts ...BotResponseOption) error {
 	log.Printf("[DEBUG] bot response - %s", resp)
 
 	for _, opt := range opts {
@@ -44,7 +45,7 @@ func (s *botResponseSender) SendBotResponse(resp BotResponse, opts ...BotRespons
 	return nil
 }
 
-func (s *botResponseSender) send(tbMsg tbapi.Chattable) error {
+func (s *BotResponseSender) send(tbMsg tbapi.Chattable) error {
 	withParseMode := func(tbMsg tbapi.Chattable, parseMode string) tbapi.Chattable {
 		switch msg := tbMsg.(type) {
 		case tbapi.MessageConfig:

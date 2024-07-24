@@ -16,6 +16,7 @@ type ResponseSender interface {
 	SendBotResponse(response sender.BotResponse, opts ...sender.BotResponseOption) error
 }
 
+// Storage - bot's persistent storage.
 type Storage interface {
 	GetBotState(ctx context.Context, userID int64) (domain.BotState, error)
 	SaveBotState(ctx context.Context, state domain.BotState) error
@@ -30,15 +31,19 @@ type Storage interface {
 	DelayReminder(ctx context.Context, id int64, remindAt time.Time) error
 }
 
+// Bot - bot implementation.
 type Bot struct {
 	responseSender ResponseSender
 	store          Storage
 }
 
+// New - creates a new [Bot].
 func New(responseSender ResponseSender, store Storage) *Bot {
 	return &Bot{responseSender: responseSender, store: store}
 }
 
+// OnMessage - bot's reaction on a message from a user.
+// Message can contain command.
 func (b *Bot) OnMessage(ctx context.Context, message domain.TgMessage) error {
 	if message.IsCommand() {
 		switch message.Text {
@@ -79,6 +84,7 @@ func (b *Bot) OnMessage(ctx context.Context, message domain.TgMessage) error {
 	}
 }
 
+// OnCallbackQuery - bot's reaction on a callback. For example, button click.
 func (b *Bot) OnCallbackQuery(ctx context.Context, callback domain.TgCallbackQuery) error {
 	if callback.IsButtonClick() {
 		switch {

@@ -16,7 +16,7 @@ func (s *storageTestSuite) Test_storage_DelayReminder() {
 		reminder := domain.Reminder{
 			ChatID:       1,
 			UserID:       1,
-			Text:         "Familiar indicated collection dense quest entirely undefined, engineers advertising curve storage worker sony research. ",
+			Text:         "Familiar indicated collection dense quest entirely undefined, engineers advertising curve Storage worker sony research. ",
 			CreatedAt:    timeNowUTC().Truncate(1 * time.Minute),
 			ModifiedAt:   timeNowUTC().Truncate(1 * time.Minute),
 			RemindAt:     timeNowUTC().Truncate(1 * time.Minute),
