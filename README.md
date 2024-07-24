@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/MEZk/tg-reminder/badge.svg?branch=master)](https://coveralls.io/github/MEZk/tg-reminder?branch=master)
+
 # tg-reminder
 
 TG-Reminder is self-hosted reminder bot specifically crafted for Telegram.
