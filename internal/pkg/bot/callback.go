@@ -60,7 +60,7 @@ func (b *Bot) onDelayReminderButton(ctx context.Context, callback domain.TgCallb
 	}
 
 	// go to start state
-	if err = b.store.SaveBotState(ctx, domain.BotState{UserID: callback.UserID, Name: domain.BotStateNameStart}); err != nil {
+	if err := b.store.SaveBotState(ctx, domain.BotState{UserID: callback.UserID, Name: domain.BotStateNameStart}); err != nil {
 		return err
 	}
 

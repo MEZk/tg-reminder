@@ -13,7 +13,7 @@ func (s *storageTestSuite) Test_storage_GetBotState() {
 		state := domain.BotState{
 			UserID:     1,
 			Name:       domain.BotStateNameStart,
-			ModifiedAt: time.Now().Truncate(1 * time.Minute),
+			ModifiedAt: timeNowUTC().Truncate(1 * time.Minute),
 			Context: &domain.BotStateContext{
 				ReminderID:   1,
 				ReminderText: "Went gang rogers teachers genome chargers directive, thing professionals.",
@@ -44,7 +44,7 @@ func (s *storageTestSuite) Test_storage_SaveBotState() {
 		state := domain.BotState{
 			UserID:     3,
 			Name:       domain.BotStateNameStart,
-			ModifiedAt: time.Now().Truncate(1 * time.Minute),
+			ModifiedAt: timeNowUTC().Truncate(1 * time.Minute),
 			Context: &domain.BotStateContext{
 				ReminderID:   2,
 				ReminderText: "Politics five verbal suited analyst minor worried, once jail improvement argument gloves dsl sussex, treasure neo contributions interaction fence.",
@@ -85,7 +85,7 @@ func (s *storageTestSuite) Test_storage_SaveBotState() {
 		state := domain.BotState{
 			UserID:     4,
 			Name:       domain.BotStateNameStart,
-			ModifiedAt: time.Now().Truncate(1 * time.Minute),
+			ModifiedAt: timeNowUTC().Truncate(1 * time.Minute),
 			Context: &domain.BotStateContext{
 				ReminderID:   2,
 				ReminderText: "Politics five verbal suited analyst minor worried, once jail improvement argument gloves dsl sussex, treasure neo contributions interaction fence.",
@@ -99,7 +99,7 @@ func (s *storageTestSuite) Test_storage_SaveBotState() {
 		state.Name = domain.BotStateNameHelp
 		state.Context.ReminderID = 2
 		state.Context.ReminderText = "Bk endangered way fossil julie principle multimedia, routing rather ceramic netscape candy correctly pin, compatible carol concerts exercises ready circus pod, lesbians tourist provinces gray pace conducting patrol, properties."
-		state.ModifiedAt = time.Now().Add(2 * time.Minute).Truncate(1 * time.Minute)
+		state.ModifiedAt = timeNowUTC().Add(2 * time.Minute).Truncate(1 * time.Minute)
 
 		s.NoError(s.storage.SaveBotState(context.TODO(), state), ErrBotStateAlreadyExists)
 

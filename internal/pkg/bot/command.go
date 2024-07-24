@@ -103,7 +103,7 @@ func (b *Bot) onMyRemindersCommand(ctx context.Context, message domain.TgMessage
 		}
 	}
 
-	if err = b.store.SaveBotState(ctx, domain.BotState{UserID: message.UserID, Name: domain.BotStateNameMyReminders}); err != nil {
+	if err := b.store.SaveBotState(ctx, domain.BotState{UserID: message.UserID, Name: domain.BotStateNameMyReminders}); err != nil {
 		return err
 	}
 

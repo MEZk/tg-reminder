@@ -23,18 +23,21 @@ type UpdateReceiver interface {
 	OnCallbackQuery(ctx context.Context, callback domain.TgCallbackQuery) error
 }
 
-type listener struct {
+// Listener - listener which listens to updates from Telegram.
+type Listener struct {
 	botAPI         BotAPI
 	updateReceiver UpdateReceiver
 }
 
-// New
-func New(botAPI BotAPI, updateReceiver UpdateReceiver) *listener {
-	return &listener{botAPI: botAPI, updateReceiver: updateReceiver}
+// New creates a new [Listener].
+func New(botAPI BotAPI, updateReceiver UpdateReceiver) *Listener {
+	return &Listener{botAPI: botAPI, updateReceiver: updateReceiver}
 }
 
-func (l *listener) Listen(ctx context.Context) error {
-	log.Printf("[INFO] start telegram updates listener")
+// Listen - listens to Telegram updates in a loop.
+// Blocks until ctx.Err.
+func (l *Listener) Listen(ctx context.Context) error {
+	log.Printf("[INFO] start telegram updates Listener")
 
 	cfg := tbapi.NewUpdate(0)
 	cfg.Timeout = 60
@@ -60,7 +63,7 @@ func (l *listener) Listen(ctx context.Context) error {
 	}
 }
 
-func (l *listener) processUpdate(ctx context.Context, update tbapi.Update) error {
+func (l *Listener) processUpdate(ctx context.Context, update tbapi.Update) error {
 	if update.Message == nil && update.CallbackQuery == nil {
 		return nil
 	}

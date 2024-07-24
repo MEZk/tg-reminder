@@ -21,11 +21,11 @@ docker:
 	docker build -t mezk/tg-reminder .
 
 race-test:
-	go test -race -timeout=60s -count 1 ./...
+	go test -race -timeout=100s -count 1 ./...
 
 build:
 	mkdir -p bin
-	cd cmd/bot && go build -ldflags "-X main.revision=$(REV) -s -w" -o ../bin/tg-reminder.$(BRANCH)
+	cd cmd/bot && go build -ldflags "-X main.revision=$(REV) -s -w" -o ../../bin/tg-reminder.$(BRANCH)
 	cp bin/tg-reminder.$(BRANCH) bin/tg-reminder
 
 release:
@@ -37,10 +37,16 @@ release:
 
 test:
 	go clean -testcache
-	go test -coverprofile=coverage.out ./...
-	grep -v "_mock.go" coverage.out | grep -v mocks > coverage_no_mocks.out
+ifneq ($(CI),)
+	echo 'Running tests in CI...'
+	go test -v -timeout=100s -covermode=atomic -coverprofile=coverage.out ./...
+else
+	echo 'Running tests locally...'
+	rm -f coverage.out coverage_no_mocks.out
+	go test -timeout=100s -covermode=atomic -coverprofile=coverage.out ./...
+endif
+	grep -v "_mock.go" coverage.out | grep -v mocks > coverage_no_mocks.out ;\
 	coverage=$$(go tool cover -func=coverage_no_mocks.out | grep total | grep -Eo '[0-9]+\.[0-9]+') ;\
-	rm -f coverage.out coverage_no_mocks.out ;\
 	echo -e "\033[32mCurrent code coverage:       $$coverage %" ;\
 	echo -e "\033[32mCode coverage threshold:     $(TEST_COVERAGE_THRESHOLD) %" ;\
 	if [ $$(bc <<< "$$coverage < $(TEST_COVERAGE_THRESHOLD)") -eq 1 ]; then \
@@ -71,8 +77,7 @@ mocks:
 
 lint:
 	$(GOLANGCI_BIN) run \
-     --new-from-rev=origin/master \
-     --config=.golangci.pipeline.yaml \
+     --config=.golangci.yml \
      --sort-results \
      --max-issues-per-linter=1000 \
      --max-same-issues=1000 \

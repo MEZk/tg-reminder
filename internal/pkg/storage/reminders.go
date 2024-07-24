@@ -10,11 +10,11 @@ import (
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
 )
 
-var (
-	ErrReminderNotFound = errors.New("reminder is not found")
-)
+// ErrReminderNotFound - reminder is not found
+var ErrReminderNotFound = errors.New("reminder is not found")
 
-func (s *storage) GetMyReminders(ctx context.Context, userID, chatID int64) ([]domain.Reminder, error) {
+// GetMyReminders - returns reminders by user id and chat id.
+func (s *Storage) GetMyReminders(ctx context.Context, userID, chatID int64) ([]domain.Reminder, error) {
 	const query = `
 		SELECT
 		    id
@@ -41,7 +41,8 @@ func (s *storage) GetMyReminders(ctx context.Context, userID, chatID int64) ([]d
 	return reminders, nil
 }
 
-func (s *storage) RemoveReminder(ctx context.Context, id int64) error {
+// RemoveReminder - removes reminder by id.
+func (s *Storage) RemoveReminder(ctx context.Context, id int64) error {
 	const query = `DELETE FROM reminders WHERE id = $1;`
 
 	res, err := s.db.ExecContext(ctx, query, id)
@@ -59,7 +60,8 @@ func (s *storage) RemoveReminder(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (s *storage) SaveReminder(ctx context.Context, reminder domain.Reminder) (int64, error) {
+// SaveReminder - saves reminder.
+func (s *Storage) SaveReminder(ctx context.Context, reminder domain.Reminder) (int64, error) {
 	now := timeNowUTC()
 	if reminder.CreatedAt.IsZero() {
 		reminder.CreatedAt = now
@@ -99,7 +101,8 @@ func (s *storage) SaveReminder(ctx context.Context, reminder domain.Reminder) (i
 	return reminder.ID, nil
 }
 
-func (s *storage) UpdateReminder(ctx context.Context, reminder domain.Reminder) error {
+// UpdateReminder - updates reminder.
+func (s *Storage) UpdateReminder(ctx context.Context, reminder domain.Reminder) error {
 	if reminder.ModifiedAt.IsZero() {
 		reminder.ModifiedAt = timeNowUTC()
 	}
@@ -132,7 +135,8 @@ func (s *storage) UpdateReminder(ctx context.Context, reminder domain.Reminder) 
 	return nil
 }
 
-func (s *storage) GetPendingRemidners(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+// GetPendingRemidners - returns reminders in [domain.ReminderStatusPending] status for active users.
+func (s *Storage) GetPendingRemidners(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 	const query = `
 		SELECT
 		    r.id
@@ -162,7 +166,8 @@ func (s *storage) GetPendingRemidners(ctx context.Context, limit int64) ([]domai
 	return reminders, nil
 }
 
-func (s *storage) SetReminderStatus(ctx context.Context, id int64, status domain.ReminderStatus) error {
+// SetReminderStatus - set's reminder status by id.
+func (s *Storage) SetReminderStatus(ctx context.Context, id int64, status domain.ReminderStatus) error {
 	const query = `UPDATE reminders SET status = $1, modified_at = $2 WHERE id = $3;`
 
 	res, err := s.db.ExecContext(ctx, query, status, timeNowUTC(), id)
@@ -179,7 +184,8 @@ func (s *storage) SetReminderStatus(ctx context.Context, id int64, status domain
 	return nil
 }
 
-func (s *storage) DelayReminder(ctx context.Context, id int64, remindAt time.Time) error {
+// DelayReminder - delays reminder by id. Reminder will be fired at remindAt time.
+func (s *Storage) DelayReminder(ctx context.Context, id int64, remindAt time.Time) error {
 	const query = "UPDATE reminders SET remind_at = $1, attempts_left = $2, modified_at = $3 WHERE id = $4;"
 
 	res, err := s.db.ExecContext(ctx, query, remindAt, domain.DefaultAttemptsLeft, timeNowUTC(), id)

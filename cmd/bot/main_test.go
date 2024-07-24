@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"os/exec"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"syscall"
 	"testing"
@@ -32,6 +33,26 @@ const (
 
 func Test_main(t *testing.T) {
 	t.Run("success: start bot, create db, send getMe, getUpdates, sendMessage requests", func(t *testing.T) {
+		a := assert.New(t)
+
+		if os.Getenv("CTX_CANCEL") != "1" {
+			cmd := exec.Command(os.Args[0], "-test.run=Test_main")
+			cmd.Env = append(os.Environ(), "CTX_CANCEL=1")
+			stdout, _ := cmd.StderrPipe()
+			if err := cmd.Start(); err != nil {
+				t.Fatal(err)
+			}
+
+			gotBytes, _ := ioutil.ReadAll(stdout)
+			a.Contains(string(gotBytes), "[ERROR] context canceled")
+
+			err := cmd.Wait()
+			if e, ok := err.(*exec.ExitError); !ok || e.Success() {
+				a.FailNowf("process ran with err %s, want exit status 1", err.Error())
+			}
+			return
+		}
+
 		f, err := os.CreateTemp("", "test-db")
 		if err != nil {
 			t.Fatal(err)
@@ -47,11 +68,10 @@ func Test_main(t *testing.T) {
 		t.Setenv(envMigrations, migrationsFolder)
 		t.Setenv(envDebug, "false")
 		t.Setenv(envTelegramAPIToken, testApiToken)
-		t.Setenv(envDbFile, dbFilename)
+		t.Setenv(envDBFile, dbFilename)
 
 		var (
 			withUpdates        atomic.Bool
-			a                  = assert.New(t)
 			testUser           = tbapi.User{ID: testUserID, UserName: testUserName}
 			testUserJSON, _    = json.Marshal(testUser)
 			testUpdatesJSON, _ = json.Marshal([]tbapi.Update{
@@ -99,11 +119,10 @@ func Test_main(t *testing.T) {
 		apiEndpoint := tgTestServer.URL + "/bot%s/%s"
 		t.Setenv(envTelegramBotAPIEndpoint, apiEndpoint)
 
-		var wg sync.WaitGroup
-		wg.Add(1)
+		const sigIntTimeout = 1 * time.Second
+
 		go func() {
-			defer wg.Done()
-			ticker := time.NewTicker(1 * time.Second)
+			ticker := time.NewTicker(sigIntTimeout)
 			select {
 			case <-ticker.C:
 				checkDBTables(a, dbFilename)
@@ -112,7 +131,6 @@ func Test_main(t *testing.T) {
 		}()
 
 		a.NotPanics(main)
-		wg.Wait()
 	})
 }
 

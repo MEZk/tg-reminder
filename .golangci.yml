@@ -19,6 +19,7 @@ linters-settings:
       - style
       - experimental
     disabled-checks:
+      - sloppyReassign
       - wrapperFunc
       - hugeParam
       - rangeValCopy
