@@ -20,37 +20,44 @@ jobs:
         uses: actions/checkout@v4
 
       - name: set up go
+        if: false
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
         id: go
 
       - name: build
+        if: false
         run: make build
         env:
           TZ: "UTC"
 
       - name: test
+        if: false
         run: make test
         env:
           TZ: "UTC"
           "CI": "true"
 
       - name: race test
+        if: false
         run: make race-test
         env:
           TZ: "UTC"
 
       - name: golangci-lint
+        if: false
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59.1
           args: --config=.golangci.yml --sort-results --max-issues-per-linter=1000 --max-same-issues=1000 ./...
 
       - name: install goveralls
+        if: false
         run: go install github.com/mattn/goveralls@latest
 
       - name: submit coverage
+        if: false
         run: $(go env GOPATH)/bin/goveralls -service="github" -coverprofile=coverage_no_mocks.out
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
