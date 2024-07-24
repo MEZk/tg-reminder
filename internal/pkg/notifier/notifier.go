@@ -32,8 +32,8 @@ type Notifier struct {
 }
 
 // New creates new Notifier.
-func New(sender BotResponseSender, storage Storage, interval time.Duration) *Notifier {
-	return &Notifier{botResponseSender: sender, storage: storage, interval: interval}
+func New(responseSender BotResponseSender, storage Storage, interval time.Duration) *Notifier {
+	return &Notifier{botResponseSender: responseSender, storage: storage, interval: interval}
 }
 
 // Run starts infinite loop to fetch reminders from Storage and send them to users.

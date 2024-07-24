@@ -40,6 +40,7 @@ jobs:
         env:
           TZ: "UTC"
 
+      # Fix linter issues (run make lint)
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:

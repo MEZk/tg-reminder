@@ -8,30 +8,32 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pressly/goose/v3"
 	"modernc.org/sqlite"
-	_ "modernc.org/sqlite" // sqlite driver loaded here
 )
 
 var timeNowUTC = func() time.Time {
 	return time.Now().UTC()
 }
 
-type storage struct {
+// Storage - storage.
+type Storage struct {
 	db *sqlx.DB
 }
 
-// NewSqllite creates a new sqlite storage.
-func NewSqllite(file, migrationsDir string) (*storage, error) {
+// NewSqllite creates a new sqlite Storage.
+func NewSqllite(file, migrationsDir string) (*Storage, error) {
 	db, err := sqlx.Connect("sqlite", file)
 	if err != nil {
 		return nil, err
 	}
 
-	goose.SetDialect(string(goose.DialectSQLite3))
+	if err = goose.SetDialect(string(goose.DialectSQLite3)); err != nil {
+		return nil, fmt.Errorf("can't set sql dialect: %w", err)
+	}
 	if err = goose.Up(db.DB, migrationsDir); err != nil {
 		return nil, fmt.Errorf("failed to up migrations: %w", err)
 	}
 
-	return &storage{db: db}, nil
+	return &Storage{db: db}, nil
 }
 
 func isAlreadyExistsError(err error) bool {
