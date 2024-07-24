@@ -21,7 +21,7 @@ docker:
 	docker build -t mezk/tg-reminder .
 
 race-test:
-	go test -race -timeout=60s -count 1 ./...
+	go test -race -timeout=100s -count 1 ./...
 
 build:
 	mkdir -p bin
@@ -37,10 +37,16 @@ release:
 
 test:
 	go clean -testcache
-	go test -coverprofile=coverage.out ./...
-	grep -v "_mock.go" coverage.out | grep -v mocks > coverage_no_mocks.out
+ifneq ($(CI),)
+	echo 'Running tests in CI...'
+	go test -v -timeout=100s -covermode=atomic -coverprofile=coverage.out ./...
+else
+	echo 'Running tests locally...'
+	rm -f coverage.out coverage_no_mocks.out
+	go test -timeout=100s -covermode=atomic -coverprofile=coverage.out ./...
+endif
+	grep -v "_mock.go" coverage.out | grep -v mocks > coverage_no_mocks.out ;\
 	coverage=$$(go tool cover -func=coverage_no_mocks.out | grep total | grep -Eo '[0-9]+\.[0-9]+') ;\
-	rm -f coverage.out coverage_no_mocks.out ;\
 	echo -e "\033[32mCurrent code coverage:       $$coverage %" ;\
 	echo -e "\033[32mCode coverage threshold:     $(TEST_COVERAGE_THRESHOLD) %" ;\
 	if [ $$(bc <<< "$$coverage < $(TEST_COVERAGE_THRESHOLD)") -eq 1 ]; then \

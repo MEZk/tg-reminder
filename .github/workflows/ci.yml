@@ -34,15 +34,23 @@ jobs:
         run: make test
         env:
           TZ: "UTC"
+          "CI": "true"
 
       - name: race test
         run: make race-test
         env:
           TZ: "UTC"
 
-      # Fix linter issues (run make lint)
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59.1
           args: --config=.golangci.yml --sort-results --max-issues-per-linter=1000 --max-same-issues=1000 ./...
+
+      - name: install goveralls
+        run: go install github.com/mattn/goveralls@latest
+
+      - name: submit coverage
+        run: $(go env GOPATH)/bin/goveralls -service="github" -coverprofile=coverage_no_mocks.out
+        env:
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
