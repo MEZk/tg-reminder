@@ -62,14 +62,14 @@ Use this token to access the HTTP API:
 
 ## Example of docker-compose.yml
 
-This is an example of a docker-compose.yml file to run the bot. It is using the latest stable version of the bot from docker hub and running as a non-root user with uid:gid 1000:1000 (matching host's uid:gid) to avoid permission issues with mounted volumes. The bot is using UTC timezone.
+This is an example of a docker-compose.yml file to run the bot. It is using the latest stable version of the bot from docker hub and running as a non-root user with uid:gid 1001:1001 (matching host's uid:gid) to avoid permission issues with mounted volumes. The bot is using UTC timezone.
 
 ```yaml
 services:
   tg-reminder:
     image: mezk/tg-reminder:latest
     hostname: tg-reminder
-    user: "1000:1000" # set uid:gid to host user to avoid permission issues with mounted volumes
+    user: "1001:1001" # set uid:gid to host user to avoid permission issues with mounted volumes
     restart: always
     container_name: tg-reminder
     # Allow colorized output

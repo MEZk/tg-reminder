@@ -24,7 +24,7 @@ RUN apk add --no-cache tzdata
 COPY --from=build /build/tg-reminder /srv/tg-reminder
 COPY migrations /srv/db/migrations
 RUN \
-    adduser -s /bin/sh -D -u 1000 app && chown -R app:app /home/app && \
+    adduser -s /bin/sh -D -u 1001 app && chown -R app:app /home/app && \
     chown -R app:app /srv/db && \
     chmod -R 775 /srv/db && \
     ls -la /srv/db && \
