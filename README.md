@@ -62,7 +62,7 @@ Use this token to access the HTTP API:
 
 ## Example of docker-compose.yml
 
-This is an example of a docker-compose.yml file to run the bot.
+This is an example of a docker-compose.yml file to run the bot. It is using the latest stable version of the bot from docker hub and running as a non-root user with uid:gid 1000:1000 (matching host's uid:gid) to avoid permission issues with mounted volumes. The bot is using UTC timezone.
 
 ```yaml
 services:
@@ -79,13 +79,13 @@ services:
         max-size: "10m"
         max-file: "5"
     environment:
+      - TZ=UTC
       - TELEGRAM_APITOKEN=${TELEGRAM_APITOKEN}
       - DEBUG=true # if you need debug logs
       - DB_FILE=/srv/db/data/tg-reminder.db # location of database file. We use embedded sqlite.
-      - MIGRATIONS=/srv/db/migrations # migrations folder for Goose.
+      - MIGRATIONS=/srv/db/migrations # migrations folder for Goose (see Dockerfile).
     volumes:
       - ./var/tg-reminder:/srv/db/data # mount volume with db file
-      - ./migrations:/srv/db/migrations # mount volume with db migration files
 ```
 
 ## Contribution
