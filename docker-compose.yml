@@ -12,10 +12,10 @@ services:
         max-size: "10m"
         max-file: "5"
     environment:
+      - TZ=UTC
       - TELEGRAM_APITOKEN=${TELEGRAM_APITOKEN}
       - DEBUG=true
       - DB_FILE=/srv/db/data/tg-reminder.db
       - MIGRATIONS=/srv/db/migrations
     volumes:
       - ./var/tg-reminder:/srv/db/data # mount volume with db file
-      - ./migrations:/srv/db/migrations # mount volume with db migration files
