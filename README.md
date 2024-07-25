@@ -69,6 +69,7 @@ services:
   tg-reminder:
     image: mezk/tg-reminder:latest
     hostname: tg-reminder
+    user: "1000:1000" # set uid:gid to host user to avoid permission issues with mounted volumes
     restart: always
     container_name: tg-reminder
     # Allow colorized output
