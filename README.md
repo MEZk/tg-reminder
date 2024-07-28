@@ -1,7 +1,10 @@
-![Build Status](https://github.com/mezk/tg-reminder/actions/workflows/ci.yml/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/MEZk/tg-reminder/badge.svg?branch=master)](https://coveralls.io/github/MEZk/tg-reminder?branch=master)
-
 # tg-reminder
+
+<div align="center">
+
+[![build](https://github.com/mezk/tg-reminder/actions/workflows/ci.yml/badge.svg)](https://github.com/mezk/tg-reminder/actions/workflows/ci.yml)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/MEZk/tg-reminder/badge.svg?branch=master)](https://coveralls.io/github/MEZk/tg-reminder?branch=master)&nbsp;[![Go Report Card](https://goreportcard.com/badge/github.com/mezk/tg-reminder)](https://goreportcard.com/report/github.com/mezk/tg-reminder)&nbsp;[![Docker Hub](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/mezk/tg-reminder)
+
+</div>
 
 TG-Reminder is self-hosted reminder bot specifically crafted for Telegram.
 Setting it up is straightforward as a Docker container, needing just a Telegram token and user ID for the user to get
