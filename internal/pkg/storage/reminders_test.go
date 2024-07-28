@@ -51,7 +51,20 @@ func (s *storageTestSuite) Test_storage_GetMyReminders() {
 			chatID = 3457547
 		)
 
-		pendingReminder := domain.Reminder{
+		pendingReminder1 := domain.Reminder{
+			ChatID:       chatID,
+			UserID:       userID,
+			Text:         "Mechanisms fatal thought massage here lakes austria, qatar bless japanese consists bonds considerable hero.",
+			CreatedAt:    timeNowUTC().Truncate(1 * time.Minute),
+			ModifiedAt:   timeNowUTC().Truncate(1 * time.Minute),
+			RemindAt:     timeNowUTC().Add(1 * time.Hour).Truncate(1 * time.Minute),
+			Status:       domain.ReminderStatusPending,
+			AttemptsLeft: 3,
+		}
+		_, err := s.storage.SaveReminder(context.TODO(), pendingReminder1)
+		s.NoError(err)
+
+		pendingReminder2 := domain.Reminder{
 			ChatID:       chatID,
 			UserID:       userID,
 			Text:         "Mechanisms fatal thought massage here lakes austria, qatar bless japanese consists bonds considerable hero.",
@@ -61,7 +74,7 @@ func (s *storageTestSuite) Test_storage_GetMyReminders() {
 			Status:       domain.ReminderStatusPending,
 			AttemptsLeft: 3,
 		}
-		_, err := s.storage.SaveReminder(context.TODO(), pendingReminder)
+		_, err = s.storage.SaveReminder(context.TODO(), pendingReminder2)
 		s.NoError(err)
 
 		doneReminder := domain.Reminder{
@@ -80,11 +93,11 @@ func (s *storageTestSuite) Test_storage_GetMyReminders() {
 		actRemidners, err := s.storage.GetMyReminders(context.TODO(), userID, chatID)
 		s.NoError(err)
 
-		requireEqualRemindersList(s.Require(), []domain.Reminder{pendingReminder}, actRemidners)
+		requireEqualRemindersList(s.Require(), []domain.Reminder{pendingReminder2, pendingReminder1}, actRemidners)
 	})
 }
 
-func (s *storageTestSuite) Test_storage_GetPendingRemidners() {
+func (s *storageTestSuite) Test_storage_GetPendingReminders() {
 	s.Run("success: user is active", func() {
 		const (
 			userID = 464357
@@ -136,7 +149,7 @@ func (s *storageTestSuite) Test_storage_GetPendingRemidners() {
 			Status: domain.UserStatusActive,
 		}))
 
-		reminders, err := s.storage.GetPendingRemidners(context.TODO(), 2)
+		reminders, err := s.storage.GetPendingReminders(context.TODO(), 2)
 		s.NoError(err)
 		requireEqualRemindersList(s.Require(), []domain.Reminder{pendingReminder1, pendingReminder2}, reminders)
 	})
@@ -166,7 +179,7 @@ func (s *storageTestSuite) Test_storage_GetPendingRemidners() {
 			Status: domain.UserStatusInactive,
 		}))
 
-		reminders, err := s.storage.GetPendingRemidners(context.TODO(), 2)
+		reminders, err := s.storage.GetPendingReminders(context.TODO(), 2)
 		s.NoError(err)
 		s.Empty(reminders)
 	})
@@ -190,7 +203,7 @@ func (s *storageTestSuite) Test_storage_GetPendingRemidners() {
 		_, err := s.storage.SaveReminder(context.TODO(), pendingReminder1)
 		s.NoError(err)
 
-		reminders, err := s.storage.GetPendingRemidners(context.TODO(), 2)
+		reminders, err := s.storage.GetPendingReminders(context.TODO(), 2)
 		s.NoError(err)
 		s.Empty(reminders)
 	})
