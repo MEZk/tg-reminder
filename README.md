@@ -1,3 +1,4 @@
+![Build Status](https://github.com/mezk/tg-reminder/actions/workflows/ci.yml/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/MEZk/tg-reminder/badge.svg?branch=master)](https://coveralls.io/github/MEZk/tg-reminder?branch=master)
 
 # tg-reminder
@@ -9,22 +10,22 @@ Once started, TG-Reminder allows user to create reminders, receiving remind noti
 
 ## Installation
 
-- The primary method of installation is via Docker. TG-Reminder is available as a Docker image, making it easy to deploy
-  and run as a container. The image is available on Docker Hub
-  at [mezk/tg-reminder](https://hub.docker.com/r/mezk/tg-reminder) as well as on GitHub Packages
-  at [ghcr.io/mezk/tg-reminder](https://ghcr.io/mezk/tg-reminder).
-- Binary releases are also available on the [releases page](https://github.com/mezk/tg-reminder/releases/latest).
-- TG-Reminder can be installed by cloning the repository and building the binary from source by running `make build`.
+-   The primary method of installation is via Docker. TG-Reminder is available as a Docker image, making it easy to deploy
+    and run as a container. The image is available on Docker Hub
+    at [mezk/tg-reminder](https://hub.docker.com/r/mezk/tg-reminder) as well as on GitHub Packages
+    at [ghcr.io/mezk/tg-reminder](https://ghcr.io/mezk/tg-reminder).
+-   Binary releases are also available on the [releases page](https://github.com/mezk/tg-reminder/releases/latest).
+-   TG-Reminder can be installed by cloning the repository and building the binary from source by running `make build`.
 
 ## Configuration
 
 All the configuration is done via environment variables:
 
-- `DB_FILE` – database file path
-- `MIGRATIONS` – migration folders for [goose](https://github.com/pressly/goose)
-- `DEBUG` – whether to print debug logs
-- `TELEGRAM_APITOKEN` – Telegram API token, received from Botfather
-- `TELEGRAM_BOT_API_ENDPOINT` – Telegram API Bot endpoint
+-   `DB_FILE` – database file path
+-   `MIGRATIONS` – migration folders for [goose](https://github.com/pressly/goose)
+-   `DEBUG` – whether to print debug logs
+-   `TELEGRAM_APITOKEN` – Telegram API token, received from Botfather
+-   `TELEGRAM_BOT_API_ENDPOINT` – Telegram API Bot endpoint
 
 ## Setting up the telegram bot
 
@@ -66,47 +67,47 @@ This is an example of a docker-compose.yml file to run the bot. It is using the 
 
 ```yaml
 services:
-  tg-reminder:
-    image: mezk/tg-reminder:latest
-    hostname: tg-reminder
-    user: "1001:1001" # set uid:gid to host user to avoid permission issues with mounted volumes
-    restart: always
-    container_name: tg-reminder
-    # Allow colorized output
-    tty: true
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "5"
-    environment:
-      - TZ=UTC
-      - TELEGRAM_APITOKEN=${TELEGRAM_APITOKEN}
-      - DEBUG=true # if you need debug logs
-      - DB_FILE=/srv/db/data/tg-reminder.db # location of database file. We use embedded sqlite.
-      - MIGRATIONS=/srv/db/migrations # migrations folder for Goose (see Dockerfile).
-    volumes:
-      - ./var/tg-reminder:/srv/db/data # mount volume with db file
+    tg-reminder:
+        image: mezk/tg-reminder:latest
+        hostname: tg-reminder
+        user: "1001:1001" # set uid:gid to host user to avoid permission issues with mounted volumes
+        restart: always
+        container_name: tg-reminder
+        # Allow colorized output
+        tty: true
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "5"
+        environment:
+            - TZ=UTC
+            - TELEGRAM_APITOKEN=${TELEGRAM_APITOKEN}
+            - DEBUG=true # if you need debug logs
+            - DB_FILE=/srv/db/data/tg-reminder.db # location of database file. We use embedded sqlite.
+            - MIGRATIONS=/srv/db/migrations # migrations folder for Goose (see Dockerfile).
+        volumes:
+            - ./var/tg-reminder:/srv/db/data # mount volume with db file
 ```
 
 ## Contribution
 
 To start contribution go to issues and choose one.
 
-- `easy` – to begin contributing;
-- `medium` – if you are already familiar with the codebase;
-- `hard` – if you are good enough to make descisions on how to implement new features and already finished at
-  least `medium` issue.
+-   `easy` – to begin contributing;
+-   `medium` – if you are already familiar with the codebase;
+-   `hard` – if you are good enough to make descisions on how to implement new features and already finished at
+    least `medium` issue.
 
 ### Makefile
 
 We use `make` to build, test and lint code:
 
-- `make test` - to run tests and check coverage threshold;
-- `make build` - to build app binary;
-- `make lint` - to run golangci linter;
-- `make docker` - to build Docker image;
-- `make mocks` - to generate mocks.
-- `make bin-deps` - to install required binary dependencies to ./bin.
+-   `make test` - to run tests and check coverage threshold;
+-   `make build` - to build app binary;
+-   `make lint` - to run golangci linter;
+-   `make docker` - to build Docker image;
+-   `make mocks` - to generate mocks.
+-   `make bin-deps` - to install required binary dependencies to ./bin.
 
 Don't forget to update `TEST_COVERAGE_THRESHOLD` variable in [Makefile](Makefile) if you increase code coverage.
