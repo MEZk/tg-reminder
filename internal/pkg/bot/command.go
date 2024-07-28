@@ -92,15 +92,16 @@ func (b *Bot) onMyRemindersCommand(ctx context.Context, message domain.TgMessage
 		})
 	}
 
-	var sb strings.Builder
-	sb.WriteString("*Вот список твоих активных напоминаний:*")
-	sb.WriteString("\n")
+	const doubleNewLine = "\n\n"
 
-	for i, r := range reminders {
-		sb.WriteString(r.UserFormat())
-		if i+1 < len(reminders) {
-			sb.WriteString("\n")
-		}
+	var sb strings.Builder
+	sb.WriteString(domain.EmojiSparkle)
+	sb.WriteString(" *СПИСОК НАПОМИНАНИЙ*")
+	sb.WriteString(doubleNewLine)
+
+	for _, r := range reminders {
+		sb.WriteString(r.FormatList())
+		sb.WriteString(doubleNewLine)
 	}
 
 	if err := b.store.SaveBotState(ctx, domain.BotState{UserID: message.UserID, Name: domain.BotStateNameMyReminders}); err != nil {

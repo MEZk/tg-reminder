@@ -529,7 +529,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "*Вот список твоих активных напоминаний:*\n12. 2024-01-01 04:01: Напоминание 1",
+						Text:   "\u2747\uFE0F *СПИСОК НАПОМИНАНИЙ*\n\n\u27A1\uFE0F Напоминание №12\n\u27A1\uFE0F 1 янв. 04:01 \u23F0\n\u27A1\uFE0F *НАПОМИНАНИЕ 1*\n\n",
 					}, response)
 					return nil
 				}
