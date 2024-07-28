@@ -38,7 +38,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,
@@ -89,7 +89,7 @@ func TestNotifier_Run(t *testing.T) {
 		)
 
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return nil, errors.New("some error")
 			},
 		}
@@ -117,7 +117,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,
@@ -171,7 +171,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,
@@ -219,7 +219,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,
