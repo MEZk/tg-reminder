@@ -27,7 +27,7 @@ func (b *Bot) onStartCommand(ctx context.Context, message domain.TgMessage) erro
 			}
 			return b.responseSender.SendBotResponse(sender.BotResponse{
 				ChatID: message.ChatID,
-				Text:   fmt.Sprintf("@%s, ранее мы уже начали общение, предлагаю продолжить!", user.Name),
+				Text:   fmt.Sprintf("@%s, ранее мы уже начали общение, предлагаю продолжить %s", user.Name, domain.EmojiWavingHand),
 			})
 		default:
 			return err
@@ -40,7 +40,7 @@ func (b *Bot) onStartCommand(ctx context.Context, message domain.TgMessage) erro
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: message.ChatID,
-		Text:   fmt.Sprintf("Привет, @%s!\nТеперь ты можешь со мной работать.\nДля справки используй команду /help.", user.Name),
+		Text:   fmt.Sprintf("*Привет,* @%s %s\n\nТеперь вы можете со мной работать.\nДля справки %s используйте команду %s", user.Name, domain.EmojiWavingHand, domain.EmojiPersonTippingHand, domain.BotCommandHelp.Markdown()),
 	})
 }
 
@@ -50,19 +50,19 @@ func (b *Bot) onHelpCommand(ctx context.Context, message domain.TgMessage) error
 	}
 
 	var helpMsg = fmt.Sprintf(`
-		Список доступных команд:
-		- %s - cправка
-		- %s - начать работу с ботом
-		- %s - cоздать напоминание
-		- %s - включить напоминания
-		- %s - выключить напоминания
-		- %s - мои напоминания`,
-		domain.BotCommandStart.Markdown(),
-		domain.BotCommandHelp.Markdown(),
-		domain.BotCommandCreateReminder.Markdown(),
-		domain.BotCommandEnableReminders.Markdown(),
-		domain.BotCommandDisableReminders.Markdown(),
-		domain.BotCommandMyReminders.Markdown(),
+*Список доступных команд*
+	• %s — cправка %s
+	• %s — начать работу с ботом %s
+	• %s — создать напоминание %s
+	• %s — включить напоминания %s
+	• %s — выключить напоминания %s
+	• %s — мои напоминания %s`,
+		domain.BotCommandHelp.Markdown(), domain.EmojiPersonTippingHand,
+		domain.BotCommandStart.Markdown(), domain.EmojiPlayButton,
+		domain.BotCommandCreateReminder.Markdown(), domain.EmojiMemo,
+		domain.BotCommandEnableReminders.Markdown(), domain.EmojiBell,
+		domain.BotCommandDisableReminders.Markdown(), domain.EmojiBellWithSlash,
+		domain.BotCommandMyReminders.Markdown(), domain.EmojiSpiralNotepad,
 	)
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
@@ -76,7 +76,7 @@ func (b *Bot) onCreateReminderCommand(ctx context.Context, message domain.TgMess
 		return err
 	}
 
-	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: message.ChatID, Text: "О чём напомнить?"})
+	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: message.ChatID, Text: fmt.Sprintf("О чём напомнить%s", domain.EmojiQuestionMark)})
 }
 
 func (b *Bot) onMyRemindersCommand(ctx context.Context, message domain.TgMessage) error {
@@ -88,22 +88,22 @@ func (b *Bot) onMyRemindersCommand(ctx context.Context, message domain.TgMessage
 	if len(reminders) == 0 {
 		return b.responseSender.SendBotResponse(sender.BotResponse{
 			ChatID: message.ChatID,
-			Text:   "У тебя нет напоминаний!",
+			Text:   fmt.Sprintf("*У вас нет напоминаний* %s\n\nЧтобы добавить напоминание используйте команду %s", domain.EmojiDisappointedFace, domain.BotCommandCreateReminder.Markdown()),
 		})
 	}
 
-	var sb strings.Builder
-	sb.WriteString("*Вот список твоих активных напоминаний:*")
-	sb.WriteString("\n")
+	const doubleNewLine = "\n\n"
 
-	for i, r := range reminders {
-		sb.WriteString(r.UserFormat())
-		if i+1 < len(reminders) {
-			sb.WriteString("\n")
-		}
+	var sb strings.Builder
+	sb.WriteString("*СПИСОК НАПОМИНАНИЙ*")
+	sb.WriteString(doubleNewLine)
+
+	for _, r := range reminders {
+		sb.WriteString(r.FormatList(timeNowUTC()))
+		sb.WriteString(doubleNewLine)
 	}
 
-	if err := b.store.SaveBotState(ctx, domain.BotState{UserID: message.UserID, Name: domain.BotStateNameMyReminders}); err != nil {
+	if err = b.store.SaveBotState(ctx, domain.BotState{UserID: message.UserID, Name: domain.BotStateNameMyReminders}); err != nil {
 		return err
 	}
 
@@ -124,7 +124,7 @@ func (b *Bot) onEnableRemindersCommand(ctx context.Context, message domain.TgMes
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: message.ChatID,
-		Text:   fmt.Sprintf(`Уведомления включены. Для отключения уведомлений воспользуйтесь командой %s.`, domain.BotCommandDisableReminders.Markdown()),
+		Text:   fmt.Sprintf("*Уведомления включены* %s\n\nДля отключения уведомлений используйте команду %s", domain.EmojiBell, domain.BotCommandDisableReminders.Markdown()),
 	})
 }
 
@@ -139,6 +139,6 @@ func (b *Bot) onDisableRemindersCommand(ctx context.Context, message domain.TgMe
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: message.ChatID,
-		Text:   fmt.Sprintf("Уведомления отключены. Для включения уведомлений воспользуйтесь командой %s.", domain.BotCommandEnableReminders.Markdown()),
+		Text:   fmt.Sprintf("*Уведомления отключены* %s\n\nДля включения уведомлений воспользуйтесь командой %s", domain.EmojiBellWithSlash, domain.BotCommandEnableReminders.Markdown()),
 	})
 }

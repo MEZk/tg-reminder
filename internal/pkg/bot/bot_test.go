@@ -55,7 +55,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Я пометил напоминание как выполненное!",
+						Text:   "Я пометил напоминание как выполненное ✅",
 					}, response)
 					return nil
 				}
@@ -81,7 +81,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Напиши номер напоминания для удаления.",
+						Text:   "Напишите номер #️⃣ напоминания для удаления.",
 					}, response)
 					return nil
 				}
@@ -114,7 +114,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 					a.EqualValues(expChatID, response.ChatID)
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Я отложил напоминание. Напомню позже *2024-01-01 15:01*!",
+						Text:   "*Я отложил напоминание* 🔄\n\nНапомню позже *2024-01-01 15:01* ⏰",
 					}, response)
 					return nil
 				}
@@ -162,7 +162,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "*2024-01-01 20:30* я напомню тебе о *FooBarBaz*!",
+						Text:   "*2024-01-01 20:30* я напомню вам о *FooBarBaz* ✅",
 					}, response)
 					return nil
 				}
@@ -188,7 +188,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Напиши номер напоминания для редактирования.",
+						Text:   "Напишите номер #️⃣ напоминания для редактирования.",
 					}, response)
 					return nil
 				}
@@ -350,7 +350,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Я не понимаю о чём речь! Пожалуйста, воспользуйся командой /help.",
+						Text:   "Я не понимаю о чём речь 🤔 Пожалуйста, воспользуйтесь командой /help.",
 					}, response)
 					return nil
 				}
@@ -437,7 +437,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Привет, @johndoe!\nТеперь ты можешь со мной работать.\nДля справки используй команду /help.",
+						Text:   "*Привет,* @johndoe 👋\n\nТеперь вы можете со мной работать.\nДля справки 💁 используйте команду /help",
 					}, response)
 					return nil
 				}
@@ -463,7 +463,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "\n\t\tСписок доступных команд:\n\t\t- /start - cправка\n\t\t- /help - начать работу с ботом\n\t\t- /create\\_reminder - cоздать напоминание\n\t\t- /enable\\_reminders - включить напоминания\n\t\t- /disable\\_reminders - выключить напоминания\n\t\t- /my\\_reminders - мои напоминания",
+						Text:   "\n*Список доступных команд*\n\t• /help — cправка 💁\n\t• /start — начать работу с ботом ▶️\n\t• /create\\_reminder — создать напоминание 📝\n\t• /enable\\_reminders — включить напоминания 🔔\n\t• /disable\\_reminders — выключить напоминания 🔕\n\t• /my\\_reminders — мои напоминания 🗒️",
 					}, response)
 					return nil
 				}
@@ -489,7 +489,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "О чём напомнить?",
+						Text:   "О чём напомнить❓",
 					}, response)
 					return nil
 				}
@@ -529,7 +529,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "*Вот список твоих активных напоминаний:*\n12. 2024-01-01 04:01: Напоминание 1",
+						Text:   "*СПИСОК НАПОМИНАНИЙ*\n\n✅ *Напоминание 1*\n⏰ 1 янв. 04:01\n#️⃣ 12\n\n",
 					}, response)
 					return nil
 				}
@@ -560,7 +560,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Уведомления включены. Для отключения уведомлений воспользуйтесь командой /disable\\_reminders.",
+						Text:   "*Уведомления включены* 🔔\n\nДля отключения уведомлений используйте команду /disable\\_reminders",
 					}, response)
 					return nil
 				}
@@ -591,7 +591,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Уведомления отключены. Для включения уведомлений воспользуйтесь командой /enable\\_reminders.",
+						Text:   "*Уведомления отключены* 🔕\n\nДля включения уведомлений воспользуйтесь командой /enable\\_reminders",
 					}, response)
 					return nil
 				}
@@ -613,7 +613,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "У тебя нет напоминаний!",
+						Text:   "*У вас нет напоминаний* 😞\n\nЧтобы добавить напоминание используйте команду /create\\_reminder",
 					}, response)
 					return nil
 				}
@@ -651,7 +651,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, opts ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "*Когда напомнить?*\n\nТекущая дата и время (Москва): 2024-01-01 04:01.\n\nВведи дату в формате *YYYY-MM-DD HH:mm*.\n\t\nНапример, 2024-06-07 11:30 значит, что я пришлю тебе напоминание 7 мая 2024 года в 11:30.\n\nИли выберите опцию ниже:",
+						Text:   "\n*Когда напомнить ❓*\n\nТекущая дата и время (Москва):\n2024-01-01 04:01\u00a0⌚\n\nВведите дату и время в формате\n*YYYY-MM-DD HH:mm*\u00a0⏰\n\nНапример, 2024-06-07 11:30 значит, что я пришлю вам напоминание 7 мая 2024 года в 11:30.\n\nИли выберите опцию ниже:",
 					}, response)
 					a.Len(opts, 1)
 					return nil
@@ -700,7 +700,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   `*2024-01-01 04:01* я напомню тебе о *FooBarBaz*!`,
+						Text:   "*2024-01-01 04:01* я напомню вам о *FooBarBaz* ✅",
 					}, response)
 					return nil
 				}
@@ -738,7 +738,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Напоминание 12345 удалено!",
+						Text:   "Напоминание 12345 удалено ❌",
 					}, response)
 					return nil
 				}
@@ -764,7 +764,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Я не понимаю о чём речь! Пожалуйста, воспользуйся командой /help.",
+						Text:   "Я не понимаю о чём речь 🤔 Пожалуйста, воспользуйтесь командой /help.",
 					}, response)
 					return nil
 				}
@@ -795,7 +795,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "@johndoe, ранее мы уже начали общение, предлагаю продолжить!",
+						Text:   "@johndoe, ранее мы уже начали общение, предлагаю продолжить 👋",
 					}, response)
 					return nil
 				}
@@ -988,7 +988,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Напоминание 12345 не найдено!",
+						Text:   "Напоминание 12345 не найдено 🤔",
 					}, response)
 					return nil
 				}
@@ -1077,7 +1077,7 @@ func TestBot_OnMessage(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, opts ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Я не понимаю о чём речь! Пожалуйста, воспользуйся командой /help.",
+						Text:   "Я не понимаю о чём речь 🤔 Пожалуйста, воспользуйтесь командой /help.",
 					}, response)
 					return nil
 				}
