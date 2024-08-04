@@ -73,15 +73,16 @@ func (r Reminder) FormatList(now time.Time) string {
 func (r Reminder) FormatNotify() string {
 	var sb strings.Builder
 	sb.WriteString(EmojiDoubleExclamationMark)
-	sb.WriteString(" *НАПОМИНАНИЕ* ")
+	sb.WriteString("*НАПОМИНАНИЕ*")
 	sb.WriteString(EmojiDoubleExclamationMark)
-	sb.WriteString("\n\n *")
+	sb.WriteString("\n\n*")
 	sb.WriteString(strings.ToUpper(r.Text))
 	sb.WriteRune('*')
 	sb.WriteString("\n\n")
-	sb.WriteString(EmojiAlarmClock)
-	sb.WriteString(" Сегодня ")
+	sb.WriteString("Сегодня ")
 	sb.WriteString(MoscowTime(r.RemindAt).Format(layoutTimeOnly))
+	sb.WriteRune(' ')
+	sb.WriteString(EmojiAlarmClock)
 	return sb.String()
 }
 

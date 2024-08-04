@@ -25,7 +25,7 @@ func (b *Bot) onDoneReminderButton(ctx context.Context, callback domain.TgCallba
 		return err
 	}
 
-	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: callback.ChatID, Text: "Я пометил напоминание как выполненное!"})
+	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: callback.ChatID, Text: domain.EmojiWhiteHeavyCheckMark + "Я пометил напоминание как выполненное!"})
 }
 
 func (b *Bot) onRemoveReminderButton(ctx context.Context, callback domain.TgCallbackQuery) error {

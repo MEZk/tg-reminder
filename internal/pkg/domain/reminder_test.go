@@ -51,7 +51,7 @@ func Test_getRussianMonth(t *testing.T) {
 func TestReminder_FormatNotify(t *testing.T) {
 	t.Parallel()
 	r := Reminder{Text: "do some thing"}
-	require.Equal(t, "‼️ *НАПОМИНАНИЕ* ‼️\n\n *DO SOME THING*\n\n⏰ Сегодня 02:30", r.FormatNotify())
+	require.Equal(t, "‼️*НАПОМИНАНИЕ*‼️\n\n*DO SOME THING*\n\nСегодня 02:30 ⏰", r.FormatNotify())
 }
 
 func TestReminder_FormatList(t *testing.T) {

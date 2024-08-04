@@ -55,7 +55,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
-						Text:   "Я пометил напоминание как выполненное!",
+						Text:   "✅Я пометил напоминание как выполненное!",
 					}, response)
 					return nil
 				}

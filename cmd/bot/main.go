@@ -85,7 +85,7 @@ func execute(ctx context.Context, dbFile, migrationsFolder, tgAPIToken string, d
 
 	tgUpdatesListener := listener.New(botAPI, reminderBot)
 
-	notificationSender := notifier.New(tgMessageSender, store, 1*time.Minute)
+	notificationSender := notifier.New(tgMessageSender, store, 10*time.Second)
 	// notifications sender starts in background goroutine
 	go func() {
 		notificationSender.Run(ctx)
