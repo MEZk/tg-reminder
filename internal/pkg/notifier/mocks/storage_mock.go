@@ -15,8 +15,8 @@ import (
 //
 //		// make and configure a mocked notifier.Storage
 //		mockedStorage := &StorageMock{
-//			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
-//				panic("mock out the GetPendingRemidners method")
+//			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+//				panic("mock out the GetPendingReminders method")
 //			},
 //			UpdateReminderFunc: func(ctx context.Context, reminder domain.Reminder) error {
 //				panic("mock out the UpdateReminder method")
@@ -28,16 +28,16 @@ import (
 //
 //	}
 type StorageMock struct {
-	// GetPendingRemidnersFunc mocks the GetPendingRemidners method.
-	GetPendingRemidnersFunc func(ctx context.Context, limit int64) ([]domain.Reminder, error)
+	// GetPendingRemindersFunc mocks the GetPendingReminders method.
+	GetPendingRemindersFunc func(ctx context.Context, limit int64) ([]domain.Reminder, error)
 
 	// UpdateReminderFunc mocks the UpdateReminder method.
 	UpdateReminderFunc func(ctx context.Context, reminder domain.Reminder) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// GetPendingRemidners holds details about calls to the GetPendingRemidners method.
-		GetPendingRemidners []struct {
+		// GetPendingReminders holds details about calls to the GetPendingReminders method.
+		GetPendingReminders []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Limit is the limit argument value.
@@ -51,14 +51,14 @@ type StorageMock struct {
 			Reminder domain.Reminder
 		}
 	}
-	lockGetPendingRemidners sync.RWMutex
+	lockGetPendingReminders sync.RWMutex
 	lockUpdateReminder      sync.RWMutex
 }
 
-// GetPendingRemidners calls GetPendingRemidnersFunc.
-func (mock *StorageMock) GetPendingRemidners(ctx context.Context, limit int64) ([]domain.Reminder, error) {
-	if mock.GetPendingRemidnersFunc == nil {
-		panic("StorageMock.GetPendingRemidnersFunc: method is nil but Storage.GetPendingRemidners was just called")
+// GetPendingReminders calls GetPendingRemindersFunc.
+func (mock *StorageMock) GetPendingReminders(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+	if mock.GetPendingRemindersFunc == nil {
+		panic("StorageMock.GetPendingRemindersFunc: method is nil but Storage.GetPendingReminders was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
@@ -67,17 +67,17 @@ func (mock *StorageMock) GetPendingRemidners(ctx context.Context, limit int64) (
 		Ctx:   ctx,
 		Limit: limit,
 	}
-	mock.lockGetPendingRemidners.Lock()
-	mock.calls.GetPendingRemidners = append(mock.calls.GetPendingRemidners, callInfo)
-	mock.lockGetPendingRemidners.Unlock()
-	return mock.GetPendingRemidnersFunc(ctx, limit)
+	mock.lockGetPendingReminders.Lock()
+	mock.calls.GetPendingReminders = append(mock.calls.GetPendingReminders, callInfo)
+	mock.lockGetPendingReminders.Unlock()
+	return mock.GetPendingRemindersFunc(ctx, limit)
 }
 
-// GetPendingRemidnersCalls gets all the calls that were made to GetPendingRemidners.
+// GetPendingRemindersCalls gets all the calls that were made to GetPendingReminders.
 // Check the length with:
 //
-//	len(mockedStorage.GetPendingRemidnersCalls())
-func (mock *StorageMock) GetPendingRemidnersCalls() []struct {
+//	len(mockedStorage.GetPendingRemindersCalls())
+func (mock *StorageMock) GetPendingRemindersCalls() []struct {
 	Ctx   context.Context
 	Limit int64
 } {
@@ -85,17 +85,17 @@ func (mock *StorageMock) GetPendingRemidnersCalls() []struct {
 		Ctx   context.Context
 		Limit int64
 	}
-	mock.lockGetPendingRemidners.RLock()
-	calls = mock.calls.GetPendingRemidners
-	mock.lockGetPendingRemidners.RUnlock()
+	mock.lockGetPendingReminders.RLock()
+	calls = mock.calls.GetPendingReminders
+	mock.lockGetPendingReminders.RUnlock()
 	return calls
 }
 
-// ResetGetPendingRemidnersCalls reset all the calls that were made to GetPendingRemidners.
-func (mock *StorageMock) ResetGetPendingRemidnersCalls() {
-	mock.lockGetPendingRemidners.Lock()
-	mock.calls.GetPendingRemidners = nil
-	mock.lockGetPendingRemidners.Unlock()
+// ResetGetPendingRemindersCalls reset all the calls that were made to GetPendingReminders.
+func (mock *StorageMock) ResetGetPendingRemindersCalls() {
+	mock.lockGetPendingReminders.Lock()
+	mock.calls.GetPendingReminders = nil
+	mock.lockGetPendingReminders.Unlock()
 }
 
 // UpdateReminder calls UpdateReminderFunc.
@@ -143,9 +143,9 @@ func (mock *StorageMock) ResetUpdateReminderCalls() {
 
 // ResetCalls reset all the calls that were made to all mocked methods.
 func (mock *StorageMock) ResetCalls() {
-	mock.lockGetPendingRemidners.Lock()
-	mock.calls.GetPendingRemidners = nil
-	mock.lockGetPendingRemidners.Unlock()
+	mock.lockGetPendingReminders.Lock()
+	mock.calls.GetPendingReminders = nil
+	mock.lockGetPendingReminders.Unlock()
 
 	mock.lockUpdateReminder.Lock()
 	mock.calls.UpdateReminder = nil

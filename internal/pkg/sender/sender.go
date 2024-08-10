@@ -70,12 +70,24 @@ func (s *BotResponseSender) send(tbMsg tbapi.Chattable) error {
 	return nil
 }
 
+const (
+	buttonTextEditReminder   = domain.EmojiMemo + " Редактировать"
+	buttonTextRemoveReminder = domain.EmojiCrossMark + " Удалить"
+	buttonTextReminderDone   = domain.EmojiWhiteHeavyCheckMark + " Готово"
+	buttonText15Min          = domain.EmojiCounterclockwiseArrowsButton + " 30 мин."
+	buttonText30Min          = domain.EmojiCounterclockwiseArrowsButton + " 80 мин."
+	buttonText1Hour          = domain.EmojiCounterclockwiseArrowsButton + " 3 час."
+	buttonText1Day           = domain.EmojiCounterclockwiseArrowsButton + " 1 ден."
+	buttonText1Week          = domain.EmojiCounterclockwiseArrowsButton + " 1 нед."
+	buttonText1Month         = domain.EmojiCounterclockwiseArrowsButton + " 1 мес."
+)
+
 func setReplyMarkup(tbMsg *tbapi.MessageConfig, resp BotResponse) {
 	if resp.showMyReminderListEditButtons {
 		tbMsg.ReplyMarkup = tbapi.NewInlineKeyboardMarkup(
 			tbapi.NewInlineKeyboardRow(
-				tbapi.NewInlineKeyboardButtonData("Редактировать", domain.ButtonDataEditReminder),
-				tbapi.NewInlineKeyboardButtonData("Удалить", domain.ButtonDataRemoveReminder),
+				tbapi.NewInlineKeyboardButtonData(buttonTextEditReminder, domain.ButtonDataEditReminder),
+				tbapi.NewInlineKeyboardButtonData(buttonTextRemoveReminder, domain.ButtonDataRemoveReminder),
 			),
 		)
 	}
@@ -102,21 +114,17 @@ func setReplyMarkup(tbMsg *tbapi.MessageConfig, resp BotResponse) {
 
 		tbMsg.ReplyMarkup = tbapi.NewInlineKeyboardMarkup(
 			tbapi.NewInlineKeyboardRow(
-				tbapi.NewInlineKeyboardButtonData("Готово", domain.ButtonDataPrefixReminderDone+reminderID),
+				tbapi.NewInlineKeyboardButtonData(buttonText15Min, domain.ButtonDataPrefixDelayReminder+reminderID+"/30m"),
+				tbapi.NewInlineKeyboardButtonData(buttonText30Min, domain.ButtonDataPrefixDelayReminder+reminderID+"/80m"),
+				tbapi.NewInlineKeyboardButtonData(buttonText1Hour, domain.ButtonDataPrefixDelayReminder+reminderID+"/3h"),
 			),
 			tbapi.NewInlineKeyboardRow(
-				tbapi.NewInlineKeyboardButtonData("Отложить на 15 мин", domain.ButtonDataPrefixDelayReminder+reminderID+"/15m"),
-				tbapi.NewInlineKeyboardButtonData("Отложить на 30 мин", domain.ButtonDataPrefixDelayReminder+reminderID+"/30m"),
+				tbapi.NewInlineKeyboardButtonData(buttonText1Day, domain.ButtonDataPrefixDelayReminder+reminderID+"/24h"),
+				tbapi.NewInlineKeyboardButtonData(buttonText1Week, domain.ButtonDataPrefixDelayReminder+reminderID+"/168h"),
+				tbapi.NewInlineKeyboardButtonData(buttonText1Month, domain.ButtonDataPrefixDelayReminder+reminderID+"/730h"),
 			),
 			tbapi.NewInlineKeyboardRow(
-				tbapi.NewInlineKeyboardButtonData("Отложить на 1 час", domain.ButtonDataPrefixDelayReminder+reminderID+"/1h"),
-				tbapi.NewInlineKeyboardButtonData("Отложить на 1 день", domain.ButtonDataPrefixDelayReminder+reminderID+"/24h"),
-			),
-			tbapi.NewInlineKeyboardRow(
-				tbapi.NewInlineKeyboardButtonData("Отложить на 1 неделю", domain.ButtonDataPrefixDelayReminder+reminderID+"/168h"),
-			),
-			tbapi.NewInlineKeyboardRow(
-				tbapi.NewInlineKeyboardButtonData("Отложить на 1 месяц", domain.ButtonDataPrefixDelayReminder+reminderID+"/730h"),
+				tbapi.NewInlineKeyboardButtonData(buttonTextReminderDone, domain.ButtonDataPrefixReminderDone+reminderID),
 			),
 		)
 	}

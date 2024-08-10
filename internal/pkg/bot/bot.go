@@ -113,7 +113,7 @@ var timeNowUTC = func() time.Time {
 func (b *Bot) sendUnsupportedResponse(chatID int64) error {
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: chatID,
-		Text:   fmt.Sprintf("Я не понимаю о чём речь! Пожалуйста, воспользуйся командой %s.", domain.BotCommandHelp),
+		Text:   fmt.Sprintf("Я не понимаю о чём речь %s Пожалуйста, воспользуйтесь командой %s.", domain.EmojiThinkingFace, domain.BotCommandHelp),
 	})
 }
 
@@ -149,6 +149,6 @@ func (b *Bot) createReminder(ctx context.Context, userID, chatID int64, remindAt
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: chatID,
-		Text:   fmt.Sprintf(`*%s* я напомню тебе о *%s*!`, domain.MoscowTime(remidner.RemindAt).Format(domain.LayoutRemindAt), remidner.Text),
+		Text:   fmt.Sprintf(`*%s* я напомню вам о *%s* %s`, domain.MoscowTime(remidner.RemindAt).Format(domain.LayoutRemindAt), remidner.Text, domain.EmojiWhiteHeavyCheckMark),
 	})
 }

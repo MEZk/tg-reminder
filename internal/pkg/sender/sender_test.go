@@ -99,8 +99,8 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 							ReplyToMessageID: 4,
 							ReplyMarkup: tbapi.NewInlineKeyboardMarkup(
 								tbapi.NewInlineKeyboardRow(
-									tbapi.NewInlineKeyboardButtonData("Редактировать", "btn_edit_reminder"),
-									tbapi.NewInlineKeyboardButtonData("Удалить", "btn_remove_reminder"),
+									tbapi.NewInlineKeyboardButtonData("📝 Редактировать", "btn_edit_reminder"),
+									tbapi.NewInlineKeyboardButtonData("❌ Удалить", "btn_remove_reminder"),
 								),
 							),
 						},
@@ -165,21 +165,17 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 							ReplyToMessageID: 4,
 							ReplyMarkup: tbapi.NewInlineKeyboardMarkup(
 								tbapi.NewInlineKeyboardRow(
-									tbapi.NewInlineKeyboardButtonData("Готово", "btn_reminder_done/12345"),
+									tbapi.NewInlineKeyboardButtonData("🔄 30 мин.", "btn_delay_reminder/12345/30m"),
+									tbapi.NewInlineKeyboardButtonData("🔄 80 мин.", "btn_delay_reminder/12345/80m"),
+									tbapi.NewInlineKeyboardButtonData("🔄 3 час.", "btn_delay_reminder/12345/3h"),
 								),
 								tbapi.NewInlineKeyboardRow(
-									tbapi.NewInlineKeyboardButtonData("Отложить на 15 мин", "btn_delay_reminder/12345/15m"),
-									tbapi.NewInlineKeyboardButtonData("Отложить на 30 мин", "btn_delay_reminder/12345/30m"),
+									tbapi.NewInlineKeyboardButtonData("🔄 1 ден.", "btn_delay_reminder/12345/24h"),
+									tbapi.NewInlineKeyboardButtonData("🔄 1 нед.", "btn_delay_reminder/12345/168h"),
+									tbapi.NewInlineKeyboardButtonData("🔄 1 мес.", "btn_delay_reminder/12345/730h"),
 								),
 								tbapi.NewInlineKeyboardRow(
-									tbapi.NewInlineKeyboardButtonData("Отложить на 1 час", "btn_delay_reminder/12345/1h"),
-									tbapi.NewInlineKeyboardButtonData("Отложить на 1 день", "btn_delay_reminder/12345/24h"),
-								),
-								tbapi.NewInlineKeyboardRow(
-									tbapi.NewInlineKeyboardButtonData("Отложить на 1 неделю", "btn_delay_reminder/12345/168h"),
-								),
-								tbapi.NewInlineKeyboardRow(
-									tbapi.NewInlineKeyboardButtonData("Отложить на 1 месяц", "btn_delay_reminder/12345/730h"),
+									tbapi.NewInlineKeyboardButtonData("✅ Готово", "btn_reminder_done/12345"),
 								),
 							),
 						},

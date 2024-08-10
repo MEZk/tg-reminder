@@ -31,16 +31,72 @@ func TestReminder_String(t *testing.T) {
 	assert.EqualValues(t, "done", ReminderStatusDone)
 }
 
-func TestReminder_UserFormat(t *testing.T) {
+func Test_getRussianMonth(t *testing.T) {
 	t.Parallel()
-	reminder := Reminder{
-		ID:           1,
-		ChatID:       2,
-		UserID:       3,
-		Text:         "sagdshyjghj",
-		RemindAt:     time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
-		Status:       ReminderStatusPending,
-		AttemptsLeft: 3,
+	a := assert.New(t)
+	a.Equal("янв.", getRussianMonth(1))
+	a.Equal("фев.", getRussianMonth(2))
+	a.Equal("мар.", getRussianMonth(3))
+	a.Equal("апр.", getRussianMonth(4))
+	a.Equal("мая", getRussianMonth(5))
+	a.Equal("июн.", getRussianMonth(6))
+	a.Equal("июл.", getRussianMonth(7))
+	a.Equal("авг.", getRussianMonth(8))
+	a.Equal("сент.", getRussianMonth(9))
+	a.Equal("окт.", getRussianMonth(10))
+	a.Equal("нояб.", getRussianMonth(11))
+	a.Equal("дек.", getRussianMonth(12))
+}
+
+func TestReminder_FormatNotify(t *testing.T) {
+	t.Parallel()
+	r := Reminder{Text: "do some thing"}
+	require.Equal(t, "‼️*НАПОМИНАНИЕ*‼️\n\n*DO SOME THING*\n\nСегодня 02:30 ⏰\n\nЧтобы отложить напоминание используйте кнопки\u00a0🔄, расположенные ниже.", r.FormatNotify())
+}
+
+func TestReminder_FormatList(t *testing.T) {
+	t.Parallel()
+
+	var (
+		jan1 = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+		jan2 = jan1.Add(24 * time.Hour)
+	)
+
+	testCases := []struct {
+		name     string
+		now      time.Time
+		reminder Reminder
+		expRes   string
+	}{
+		{
+			name: "today",
+			now:  jan1,
+			reminder: Reminder{
+				ID:       1,
+				Text:     "Foo bar baz",
+				RemindAt: jan1,
+			},
+			expRes: "✅ *Foo bar baz*❗\n⏰ Сегодня 03:00\n#️⃣ 1",
+		},
+		{
+			name: "tommorow",
+			now:  jan1,
+			reminder: Reminder{
+				ID:       1,
+				Text:     "Foo bar baz",
+				RemindAt: jan2,
+			},
+			expRes: "✅ *Foo bar baz*\n⏰ 2 янв. 03:00\n#️⃣ 1",
+		},
 	}
-	assert.Equal(t, "1. 2020-01-01 03:00: sagdshyjghj", reminder.UserFormat())
+
+	for _, tc := range testCases {
+		tc := tc
+
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			assert.Equal(t, tc.expRes, tc.reminder.FormatList(tc.now))
+		})
+	}
 }

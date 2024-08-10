@@ -30,7 +30,7 @@ func TestNotifier_Run(t *testing.T) {
 
 				a.Equal(sender.BotResponse{
 					ChatID: chatID,
-					Text:   "FooBar",
+					Text:   "‼️*НАПОМИНАНИЕ*‼️\n\n*FOOBAR*\n\nСегодня 02:30\u00a0⏰\n\nЧтобы отложить напоминание используйте кнопки\u00a0🔄, расположенные ниже.",
 				}, response)
 
 				a.Len(opts, 1)
@@ -38,7 +38,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,
@@ -89,7 +89,7 @@ func TestNotifier_Run(t *testing.T) {
 		)
 
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return nil, errors.New("some error")
 			},
 		}
@@ -117,7 +117,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,
@@ -163,7 +163,7 @@ func TestNotifier_Run(t *testing.T) {
 
 				a.Equal(sender.BotResponse{
 					ChatID: chatID,
-					Text:   "FooBar",
+					Text:   "‼️*НАПОМИНАНИЕ*‼️\n\n*FOOBAR*\n\nСегодня 02:30\u00a0⏰\n\nЧтобы отложить напоминание используйте кнопки\u00a0🔄, расположенные ниже.",
 				}, response)
 
 				a.Len(opts, 1)
@@ -171,7 +171,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,
@@ -211,7 +211,7 @@ func TestNotifier_Run(t *testing.T) {
 
 				a.Equal(sender.BotResponse{
 					ChatID: chatID,
-					Text:   "FooBar",
+					Text:   "‼️*НАПОМИНАНИЕ*‼️\n\n*FOOBAR*\n\nСегодня 02:30\u00a0⏰\n\nЧтобы отложить напоминание используйте кнопки\u00a0🔄, расположенные ниже.",
 				}, response)
 
 				a.Len(opts, 1)
@@ -219,7 +219,7 @@ func TestNotifier_Run(t *testing.T) {
 			},
 		}
 		storageMock := mocks.StorageMock{
-			GetPendingRemidnersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
 						ID:           reminderID,

@@ -29,7 +29,8 @@ func (s *Storage) GetMyReminders(ctx context.Context, userID, chatID int64) ([]d
 		FROM reminders	
 		WHERE user_id = $1
 			AND chat_id = $2
-			AND status = 'pending'`
+			AND status = 'pending'
+		ORDER BY remind_at`
 
 	var reminders []domain.Reminder
 	if err := s.db.SelectContext(ctx, &reminders, query, userID, chatID); err != nil {
@@ -135,8 +136,8 @@ func (s *Storage) UpdateReminder(ctx context.Context, reminder domain.Reminder) 
 	return nil
 }
 
-// GetPendingRemidners - returns reminders in [domain.ReminderStatusPending] status for active users.
-func (s *Storage) GetPendingRemidners(ctx context.Context, limit int64) ([]domain.Reminder, error) {
+// GetPendingReminders - returns reminders in [domain.ReminderStatusPending] status for active users.
+func (s *Storage) GetPendingReminders(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 	const query = `
 		SELECT
 		    r.id

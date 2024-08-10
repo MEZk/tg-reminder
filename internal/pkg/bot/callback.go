@@ -25,7 +25,7 @@ func (b *Bot) onDoneReminderButton(ctx context.Context, callback domain.TgCallba
 		return err
 	}
 
-	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: callback.ChatID, Text: "Я пометил напоминание как выполненное!"})
+	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: callback.ChatID, Text: fmt.Sprintf("Я пометил напоминание как выполненное %s", domain.EmojiWhiteHeavyCheckMark)})
 }
 
 func (b *Bot) onRemoveReminderButton(ctx context.Context, callback domain.TgCallbackQuery) error {
@@ -35,7 +35,7 @@ func (b *Bot) onRemoveReminderButton(ctx context.Context, callback domain.TgCall
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: callback.ChatID,
-		Text:   "Напиши номер напоминания для удаления.",
+		Text:   fmt.Sprintf("Напишите номер %s напоминания для удаления.", domain.EmojiKeycapHash),
 	})
 }
 
@@ -60,13 +60,13 @@ func (b *Bot) onDelayReminderButton(ctx context.Context, callback domain.TgCallb
 	}
 
 	// go to start state
-	if err := b.store.SaveBotState(ctx, domain.BotState{UserID: callback.UserID, Name: domain.BotStateNameStart}); err != nil {
+	if err = b.store.SaveBotState(ctx, domain.BotState{UserID: callback.UserID, Name: domain.BotStateNameStart}); err != nil {
 		return err
 	}
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: callback.ChatID,
-		Text:   fmt.Sprintf("Я отложил напоминание. Напомню позже *%s*!", remindAt.Format(domain.LayoutRemindAt)),
+		Text:   fmt.Sprintf("*Я отложил напоминание* %s\n\nНапомню позже *%s* %s", domain.EmojiCounterclockwiseArrowsButton, remindAt.Format(domain.LayoutRemindAt), domain.EmojiAlarmClock),
 	})
 }
 
@@ -86,6 +86,6 @@ func (b *Bot) onEditReminderButton(ctx context.Context, callback domain.TgCallba
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{
 		ChatID: callback.ChatID,
-		Text:   "Напиши номер напоминания для редактирования.",
+		Text:   fmt.Sprintf("Напишите номер %s напоминания для редактирования.", domain.EmojiKeycapHash),
 	})
 }

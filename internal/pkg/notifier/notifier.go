@@ -15,7 +15,7 @@ var timeNowUTC = func() time.Time {
 
 // Storage - storage interface.
 type Storage interface {
-	GetPendingRemidners(ctx context.Context, limit int64) ([]domain.Reminder, error)
+	GetPendingReminders(ctx context.Context, limit int64) ([]domain.Reminder, error)
 	UpdateReminder(ctx context.Context, reminder domain.Reminder) error
 }
 
@@ -54,7 +54,7 @@ func (n *Notifier) Run(ctx context.Context) {
 			log.Printf("[DEBUG] notifier start sending reminders")
 
 			const limit = 100
-			reminders, err := n.storage.GetPendingRemidners(ctx, limit)
+			reminders, err := n.storage.GetPendingReminders(ctx, limit)
 			if err != nil {
 				log.Printf("[ERROR] failed to fetch reminders: %v", err)
 				continue
@@ -63,7 +63,7 @@ func (n *Notifier) Run(ctx context.Context) {
 			for _, r := range reminders {
 				if err = n.botResponseSender.SendBotResponse(sender.BotResponse{
 					ChatID: r.ChatID,
-					Text:   r.Text,
+					Text:   r.FormatNotify(),
 				}, sender.WithReminderDoneButton(r.ID)); err != nil {
 					log.Printf("[ERROR] failed to send reminder %d: %v", r.ID, err)
 				}

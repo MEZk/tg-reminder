@@ -22,15 +22,22 @@ func (b *Bot) onEnterReminderTextUserMessage(ctx context.Context, message domain
 		return err
 	}
 
-	var text = fmt.Sprintf(`*Когда напомнить?*
+	var text = fmt.Sprintf(`
+*Когда напомнить %s*
 
-Текущая дата и время (Москва): %s.
+Текущая дата и время (Москва):
+%s%s%s
 
-Введи дату в формате *YYYY-MM-DD HH:mm*.
-	
-Например, 2024-06-07 11:30 значит, что я пришлю тебе напоминание 7 мая 2024 года в 11:30.
+Введите дату и время в формате
+*YYYY-MM-DD HH:mm*%s%s
 
-Или выберите опцию ниже:`, domain.MoscowTime(timeNowUTC()).Format(domain.LayoutRemindAt))
+Например, 2024-06-07 11:30 значит, что я пришлю вам напоминание 7 мая 2024 года в 11:30.
+
+Или выберите опцию ниже:`,
+		domain.EmojiQuestionMark,
+		domain.MoscowTime(timeNowUTC()).Format(domain.LayoutRemindAt), domain.NoBreakSpace, domain.EmojiWatch,
+		domain.NoBreakSpace, domain.EmojiAlarmClock,
+	)
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: message.ChatID, Text: text}, sender.WithReminderDatesButtons())
 }
@@ -50,12 +57,12 @@ func (b *Bot) onRemoveReminderUserMessage(ctx context.Context, message domain.Tg
 		return fmt.Errorf("failed to parse reminder id %s: %w", message.Text, err)
 	}
 
-	responseMsg := fmt.Sprintf("Напоминание %d удалено!", reminderID)
+	responseMsg := fmt.Sprintf("Напоминание %d удалено %s", reminderID, domain.EmojiCrossMark)
 
 	if err = b.store.RemoveReminder(ctx, reminderID); err != nil {
 		switch {
 		case errors.Is(err, storage.ErrReminderNotFound):
-			responseMsg = fmt.Sprintf("Напоминание %d не найдено!", reminderID)
+			responseMsg = fmt.Sprintf("Напоминание %d не найдено %s", reminderID, domain.EmojiThinkingFace)
 		default:
 			return err
 		}
