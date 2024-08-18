@@ -6,10 +6,25 @@ import (
 	"fmt"
 	"strconv"
 
+	log "github.com/go-pkgz/lgr"
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
 	"github.com/mezk/tg-reminder/internal/pkg/sender"
 	"github.com/mezk/tg-reminder/internal/pkg/storage"
 )
+
+const enterRemindAtFormats = `*Вы можете использовать следующие форматы:*
+
+- в 19:00
+- завтра
+- завтра в 19:00
+- в среду в 15:00
+- через час
+- через 2 часа
+- 30.01.2024 в 11:00
+- через месяц
+- 2024-08-29 11:30
+
+*Введите дату и время напоминания или выберите опцию ниже:*`
 
 func (b *Bot) onEnterReminderTextUserMessage(ctx context.Context, message domain.TgMessage) error {
 	state := domain.BotState{
@@ -22,30 +37,27 @@ func (b *Bot) onEnterReminderTextUserMessage(ctx context.Context, message domain
 		return err
 	}
 
-	var text = fmt.Sprintf(`
-*Когда напомнить %s*
-
-Текущая дата и время (Москва):
-%s%s%s
-
-Введите дату и время в формате
-*YYYY-MM-DD HH:mm*%s%s
-
-Например, 2024-06-07 11:30 значит, что я пришлю вам напоминание 7 мая 2024 года в 11:30.
-
-Или выберите опцию ниже:`,
+	text := fmt.Sprintf("*Когда напомнить %s\n\n*Текущая дата и время (Москва)%s%s\n*%s*\n\n%s",
 		domain.EmojiQuestionMark,
-		domain.MoscowTime(timeNowUTC()).Format(domain.LayoutRemindAt), domain.NoBreakSpace, domain.EmojiWatch,
 		domain.NoBreakSpace, domain.EmojiAlarmClock,
+		domain.MoscowTime(timeNowUTC()).Format(domain.LayoutRemindAt),
+		enterRemindAtFormats,
 	)
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: message.ChatID, Text: text}, sender.WithReminderDatesButtons())
 }
 
 func (b *Bot) onEnterRemindAtUserMessage(ctx context.Context, message domain.TgMessage) error {
-	remindAt, err := message.RemindAt()
+	remindAt, err := message.RemindAt(timeNowUTC())
 	if err != nil {
-		return err
+		log.Printf("[WARN] failed to parse remindAt from %s: %s", message.Text, err)
+
+		text := fmt.Sprintf("%s Не удалось понять время из запроса, пожалуйста, попытайтесь его изменить. Время должно быть в будущем.\n\n%s",
+			domain.EmojiThinkingFace,
+			enterRemindAtFormats,
+		)
+
+		return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: message.ChatID, Text: text}, sender.WithReminderDatesButtons())
 	}
 
 	return b.createReminder(ctx, message.UserID, message.ChatID, remindAt)

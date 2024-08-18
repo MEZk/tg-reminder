@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	log "github.com/go-pkgz/lgr"
+	"github.com/markusmobius/go-dateparser"
+	"github.com/markusmobius/go-dateparser/date"
 )
 
 // TgMessage represents a Telegram message.
@@ -26,11 +30,24 @@ func (m TgMessage) String() string {
 }
 
 // RemindAt extracts date and time when reminder should be sent to user.
-func (m TgMessage) RemindAt() (time.Time, error) {
+func (m TgMessage) RemindAt(now time.Time) (time.Time, error) {
 	// TODO: parse remindAt in user timezone, now default is MSK
-	remindAt, err := time.ParseInLocation(LayoutRemindAt, m.Text, locationMSK)
+	now = MoscowTime(now)
+
+	remindAt, err := time.ParseInLocation(LayoutRemindAt, m.Text, now.Location())
 	if err != nil {
-		return time.Time{}, fmt.Errorf("can't parse remindAt %s: %w", m.Text, err)
+		log.Printf("[DEBUG] can't parse (time.ParseInLocation) remindAt %s: %s\n", m.Text, err)
+
+		var remindAtDate date.Date
+		if remindAtDate, err = dateparser.Parse(&dateparser.Configuration{
+			CurrentTime:         now,
+			Locales:             []string{"ru"},
+			PreferredDateSource: dateparser.Future,
+		}, m.Text); err != nil {
+			return time.Time{}, fmt.Errorf("can't parse (go-dateparser) remindAt: %w", err)
+		}
+
+		return remindAtDate.Time, nil
 	}
 
 	return remindAt.Truncate(1 * time.Minute), nil

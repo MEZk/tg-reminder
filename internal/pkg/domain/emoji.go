@@ -35,8 +35,6 @@ const (
 	EmojiDisappointedFace = "\U0001f61e"
 	// EmojiThinkingFace - thinking face
 	EmojiThinkingFace = "\U0001f914"
-	// EmojiWatch - watch
-	EmojiWatch = "\u231a"
 )
 
 // NoBreakSpace - no-break space
