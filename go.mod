@@ -10,7 +10,7 @@ require (
 	github.com/markusmobius/go-dateparser v1.2.3
 	github.com/pressly/goose/v3 v3.21.1
 	github.com/stretchr/testify v1.9.0
-	modernc.org/sqlite v1.31.1
+	modernc.org/sqlite v1.32.0
 )
 
 require (
