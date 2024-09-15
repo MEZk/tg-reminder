@@ -8,7 +8,7 @@ import (
 )
 
 // DefaultAttemptsLeft - default attempts left to deliver a reminder.
-const DefaultAttemptsLeft = 3
+const DefaultAttemptsLeft = 10
 
 // Reminder - reminder representation.
 type Reminder struct {

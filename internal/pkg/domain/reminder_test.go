@@ -10,7 +10,7 @@ import (
 
 func Test_DefaultAttemptsLeft(t *testing.T) {
 	t.Parallel()
-	require.EqualValues(t, 3, DefaultAttemptsLeft)
+	require.EqualValues(t, 10, DefaultAttemptsLeft)
 }
 
 func TestReminder_String(t *testing.T) {

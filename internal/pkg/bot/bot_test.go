@@ -147,7 +147,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 						Text:         "FooBarBaz",
 						RemindAt:     time.Date(2024, 1, 1, 17, 30, 0, 0, time.UTC),
 						Status:       domain.ReminderStatusPending,
-						AttemptsLeft: 3,
+						AttemptsLeft: 10,
 					}, reminder)
 					return 1, nil
 				}
@@ -692,7 +692,7 @@ func TestBot_OnMessage(t *testing.T) {
 						Text:         "FooBarBaz",
 						RemindAt:     time.Date(2024, 1, 1, 1, 1, 0, 0, time.UTC),
 						Status:       domain.ReminderStatusPending,
-						AttemptsLeft: 3,
+						AttemptsLeft: 10,
 					}, reminder)
 					return 1, nil
 				}
