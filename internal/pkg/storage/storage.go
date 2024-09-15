@@ -20,16 +20,11 @@ type Storage struct {
 }
 
 // NewSqllite creates a new sqlite Storage.
-func NewSqllite(file, migrationsDir string) (*Storage, error) {
-	db, err := sqlx.Connect("sqlite", file)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = goose.SetDialect(string(goose.DialectSQLite3)); err != nil {
+func NewSqllite(db *sqlx.DB, migrationsDir string) (*Storage, error) {
+	if err := goose.SetDialect(string(goose.DialectSQLite3)); err != nil {
 		return nil, fmt.Errorf("can't set sql dialect: %w", err)
 	}
-	if err = goose.Up(db.DB, migrationsDir); err != nil {
+	if err := goose.Up(db.DB, migrationsDir); err != nil {
 		return nil, fmt.Errorf("failed to up migrations: %w", err)
 	}
 
