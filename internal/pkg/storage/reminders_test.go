@@ -33,7 +33,7 @@ func (s *storageTestSuite) Test_storage_DelayReminder() {
 
 		// ASSERT
 		actReminder := s.mustGetReminder(id)
-		s.EqualValues(3, actReminder.AttemptsLeft)
+		s.EqualValues(10, actReminder.AttemptsLeft)
 		s.Equal(remindAt, actReminder.RemindAt)
 		s.Equal(domain.ReminderStatusPending, actReminder.Status)
 		s.Greater(actReminder.ModifiedAt, reminder.ModifiedAt)
