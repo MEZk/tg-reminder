@@ -17,5 +17,9 @@ services:
       - DEBUG=true
       - DB_FILE=/srv/db/data/tg-reminder.db
       - MIGRATIONS=/srv/db/migrations
+      - BACKUP_RETENTION=48h
+      - BACKUP_INTERVAL=12h
+      - BACKUP_DIR=/srv/db/data/backup
     volumes:
       - ./var/tg-reminder:/srv/db/data # mount volume with db file
+      - ./migrations:/srv/db/migrations # mount volume with db migrations

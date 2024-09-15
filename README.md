@@ -29,6 +29,9 @@ All the configuration is done via environment variables:
 -   `DEBUG` – whether to print debug logs
 -   `TELEGRAM_APITOKEN` – Telegram API token, received from Botfather
 -   `TELEGRAM_BOT_API_ENDPOINT` – Telegram API Bot endpoint
+-   `BACKUP_DIR` – directory where to place db backups
+-   `BACKUP_INTERVAL` – how often to make db backups
+-   `BACKUP_RETENTION` – retention period for old db backups
 
 ## Setting up the telegram bot
 
@@ -89,8 +92,12 @@ services:
             - DEBUG=true # if you need debug logs
             - DB_FILE=/srv/db/data/tg-reminder.db # location of database file. We use embedded sqlite.
             - MIGRATIONS=/srv/db/migrations # migrations folder for Goose (see Dockerfile).
+            - BACKUP_DIR=/srv/db/data/backup # directory where to place db backups
+            - BACKUP_RETENTION=48h # retention period for old db backups
+            - BACKUP_INTERVAL=12h # how often to make db backups
         volumes:
             - ./var/tg-reminder:/srv/db/data # mount volume with db file
+            - ./migrations:/srv/db/migrations # mount volume with db migrations
 ```
 
 ## Contribution

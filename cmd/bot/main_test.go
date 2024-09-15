@@ -31,6 +31,7 @@ const (
 	migrationsFolder = "../../migrations"
 )
 
+// TODO: fix test, it does not work. See https://github.com/MEZk/tg-reminder/issues/25
 func Test_main(t *testing.T) {
 	t.Run("success: start bot, create db, send getMe, getUpdates, sendMessage requests", func(t *testing.T) {
 		a := assert.New(t)

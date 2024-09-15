@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -27,7 +28,12 @@ func (s *storageTestSuite) SetupSuite() {
 
 	s.dbPath = path.Join(s.T().TempDir(), testDB)
 
-	store, err := NewSqllite(s.dbPath, "../../../migrations")
+	db, err := sqlx.Connect("sqlite", s.dbPath)
+	if err != nil {
+		s.FailNow(err.Error())
+	}
+
+	store, err := NewSqllite(db, "../../../migrations")
 	if err != nil {
 		s.FailNow(err.Error())
 	}
