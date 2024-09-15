@@ -12,11 +12,13 @@ import (
 	"github.com/fatih/color"
 	log "github.com/go-pkgz/lgr"
 	tbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/mezk/tg-reminder/internal/pkg/bot"
 	"github.com/mezk/tg-reminder/internal/pkg/listener"
 	"github.com/mezk/tg-reminder/internal/pkg/notifier"
 	"github.com/mezk/tg-reminder/internal/pkg/sender"
 	"github.com/mezk/tg-reminder/internal/pkg/storage"
+	"github.com/mezk/tg-reminder/internal/pkg/storage/backuper"
 )
 
 const (
@@ -25,6 +27,9 @@ const (
 	envDebug                  = "DEBUG"                     // whether to print debug logs
 	envTelegramAPIToken       = "TELEGRAM_APITOKEN"         // Telegram API token, received from Botfather
 	envTelegramBotAPIEndpoint = "TELEGRAM_BOT_API_ENDPOINT" // Telegram API Bot endpoint
+	envBackupRetention        = "BACKUP_RETENTION"          // backup retention interval
+	envBackupInterval         = "BACKUP_INTERVAL"           // backup interval
+	envBackupDir              = "BACKUP_DIR"                // backup files directory
 )
 
 var revision = "local"
@@ -74,9 +79,35 @@ func execute(ctx context.Context, dbFile, migrationsFolder, tgAPIToken string, d
 	}
 	botAPI.Debug = debug
 
-	store, err := storage.NewSqllite(dbFile, migrationsFolder)
+	db, err := sqlx.Connect("sqlite", dbFile)
+	if err != nil {
+		return fmt.Errorf("can't connect to database: %w", err)
+	}
+
+	store, err := storage.NewSqllite(db, migrationsFolder)
 	if err != nil {
 		return fmt.Errorf("failed to connect to sqlite %s: %v", dbFile, err)
+	}
+
+	if backupDir := os.Getenv(envBackupDir); backupDir != "" {
+		backupRetentionInterval, err := time.ParseDuration(os.Getenv(envBackupRetention))
+		if err != nil {
+			return fmt.Errorf("can't parse backup retention interval: %w", err)
+		}
+
+		backupInterval, err := time.ParseDuration(os.Getenv(envBackupInterval))
+		if err != nil {
+			return fmt.Errorf("can't parse backup interval: %w", err)
+		}
+
+		backup, err := backuper.New(db, backupDir, backupInterval, backupRetentionInterval)
+		if err != nil {
+			return fmt.Errorf("can't create backuper: %w", err)
+		}
+		// backuper sender starts in background goroutine
+		go func() {
+			backup.Run(ctx)
+		}()
 	}
 
 	tgMessageSender := sender.New(botAPI)
