@@ -1,6 +1,10 @@
 run:
   timeout: 5m
-  tests: false
+  tests: true
+  allow-parallel-runners: true
+
+output:
+  show-stats: true
 
 linters-settings:
   govet:
@@ -41,11 +45,12 @@ linters:
     - ineffassign
     - stylecheck
     - gochecknoinits
-    - exportloopref
     - gocritic
     - nakedret
     - gosimple
     - prealloc
+    - testifylint
+    - paralleltest
   fast: false
   disable-all: true
 
@@ -63,4 +68,8 @@ issues:
       linters:
         - gosec
         - dupl
+    - path: _test\.go
+      text: "unused-parameter: parameter"
+      linters:
+        - revive
   exclude-use-default: false

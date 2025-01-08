@@ -81,12 +81,6 @@ func TestNotifier_Run(t *testing.T) {
 	t.Run("error: can't get pending reminders", func(t *testing.T) {
 		t.Parallel()
 
-		const (
-			reminderID int64 = 436745
-			userID     int64 = 4357
-			chatID     int64 = 4568
-		)
-
 		storageMock := StorageMock{
 			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return nil, errors.New("some error")

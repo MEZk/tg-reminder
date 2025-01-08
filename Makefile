@@ -61,7 +61,7 @@ new-db:
 bin-deps:
 	tmp=$$(mktemp -d) && cd $$tmp && pwd && go mod init temp && \
 	GOBIN=$(LOCAL_BIN) go install github.com/matryer/moq@v0.3.4 && \
-	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.59.1 && \
+	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4 && \
 	GOBIN=$(LOCAL_BIN) go install github.com/goreleaser/goreleaser/v2@v2.1.0 && \
 	rm -fr $$tmp
 

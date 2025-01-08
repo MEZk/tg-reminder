@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// nolint:paralleltest // test modifies package level function timeNowUTC.
 func TestBot_OnCallbackQuery(t *testing.T) {
 	const (
 		expChatID   int64 = 43548
@@ -358,8 +359,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
+		// nolint:paralleltest // test modifies package level function timeNowUTC.
 		t.Run(tc.name, func(t *testing.T) {
 			if !tc.now.IsZero() {
 				tmpTimeNowUTC := timeNowUTC
@@ -391,6 +391,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 	}
 }
 
+// nolint:paralleltest // test modifies package level function timeNowUTC.
 func TestBot_OnMessage(t *testing.T) {
 	const (
 		expChatID   int64 = 43548
@@ -1111,8 +1112,7 @@ func TestBot_OnMessage(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
+		// nolint:paralleltest // test modifies package level function timeNowUTC.
 		t.Run(tc.name, func(t *testing.T) {
 			if !tc.now.IsZero() {
 				tmpTimeNowUTC := timeNowUTC

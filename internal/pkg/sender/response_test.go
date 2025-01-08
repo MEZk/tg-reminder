@@ -45,8 +45,6 @@ func TestBotResponse_String(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			assert.New(t).Equal(tc.want, tc.resp.String())

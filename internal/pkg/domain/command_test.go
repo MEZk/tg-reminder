@@ -13,6 +13,7 @@ func TestBotCommand_Markdown(t *testing.T) {
 }
 
 func TestBotCommand_String(t *testing.T) {
+	t.Parallel()
 	a := assert.New(t)
 	a.Equal("/start", BotCommandStart.String())
 	a.Equal("/help", BotCommandHelp.String())
