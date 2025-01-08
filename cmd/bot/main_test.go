@@ -23,11 +23,11 @@ import (
 )
 
 const (
-	testChatID       = 32467
-	testUserID       = 345757
-	testUserName     = "JohnDoe"
-	testAPIToken     = "e30637b8-8d51-457d-b8e4-0eee79e3cf5c"
-	migrationsFolder = "../../migrations"
+	testChatID    = 32467
+	testUserID    = 345757
+	testUserName  = "JohnDoe"
+	testAPIToken  = "e30637b8-8d51-457d-b8e4-0eee79e3cf5c"
+	migrationsDir = "../../migrations"
 )
 
 //nolint:testifylint // TODO: fix test, it does not work. See https://github.com/MEZk/tg-reminder/issues/25
@@ -65,7 +65,7 @@ func Test_main(t *testing.T) {
 			os.Remove(dbFilename)
 		}()
 
-		t.Setenv(envMigrations, migrationsFolder)
+		t.Setenv(envMigrations, migrationsDir)
 		t.Setenv(envDebug, "false")
 		t.Setenv(envTelegramAPIToken, testAPIToken)
 		t.Setenv(envDBFile, dbFilename)

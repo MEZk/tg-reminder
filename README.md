@@ -24,14 +24,14 @@ Once started, TG-Reminder allows user to create reminders, receiving remind noti
 
 All the configuration is done via environment variables:
 
--   `DB_FILE` – database file path
--   `MIGRATIONS` – migration folders for [goose](https://github.com/pressly/goose)
--   `DEBUG` – whether to print debug logs
--   `TELEGRAM_APITOKEN` – Telegram API token, received from Botfather
--   `TELEGRAM_BOT_API_ENDPOINT` – Telegram API Bot endpoint
--   `BACKUP_DIR` – directory where to place db backups
--   `BACKUP_INTERVAL` – how often to make db backups
--   `BACKUP_RETENTION` – retention period for old db backups
+-   `DB_FILE` – database file path (mandatory)
+-   `MIGRATIONS` – migration directory for [goose](https://github.com/pressly/goose), default is `/srv/db/migrations` (optional)
+-   `DEBUG` – whether to print debug logs (optional)
+-   `TELEGRAM_APITOKEN` – Telegram API token, received from Botfather (mandatory)
+-   `TELEGRAM_BOT_API_ENDPOINT` – Telegram API Bot endpoint (optional)
+-   `BACKUP_DIR` – directory where to place db backups (optional)
+-   `BACKUP_INTERVAL` – how often to make db backups (optional, if BACKUP_DIR is not set)
+-   `BACKUP_RETENTION` – retention period for old db backups (optional, if BACKUP_DIR is not set)
 
 ## Setting up the telegram bot
 
@@ -91,14 +91,16 @@ services:
             - TELEGRAM_APITOKEN=${TELEGRAM_APITOKEN}
             - DEBUG=true # if you need debug logs
             - DB_FILE=/srv/db/data/tg-reminder.db # location of database file. We use embedded sqlite.
-            - MIGRATIONS=/srv/db/migrations # migrations folder for Goose (see Dockerfile).
+            - MIGRATIONS=/srv/db/migrations # optional, default directory with migrations is /srv/db/migrations
             - BACKUP_DIR=/srv/db/data/backup # directory where to place db backups
             - BACKUP_RETENTION=48h # retention period for old db backups
             - BACKUP_INTERVAL=12h # how often to make db backups
         volumes:
             - ./var/tg-reminder:/srv/db/data # mount volume with db file
-            - ./migrations:/srv/db/migrations # mount volume with db migrations
+            - ./migrations:/srv/db/migrations # mount volume with db migrations (optional, migrations are copied at docker image build phase into default directory /srv/db/migrations)
 ```
+
+See [docker-compose.yml](./docker-compose.yml) for more examples.
 
 ## Contribution
 

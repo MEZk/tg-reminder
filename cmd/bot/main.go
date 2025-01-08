@@ -23,7 +23,7 @@ import (
 
 const (
 	envDBFile                 = "DB_FILE"                   // database file path
-	envMigrations             = "MIGRATIONS"                // migration folders for goose
+	envMigrations             = "MIGRATIONS"                // migration directory for goose
 	envDebug                  = "DEBUG"                     // whether to print debug logs
 	envTelegramAPIToken       = "TELEGRAM_APITOKEN"         // Telegram API token, received from Botfather
 	envTelegramBotAPIEndpoint = "TELEGRAM_BOT_API_ENDPOINT" // Telegram API Bot endpoint
@@ -38,7 +38,11 @@ func main() {
 	fmt.Printf("tg-reminder %s\n", revision)
 
 	dbFile := os.Getenv(envDBFile)
-	migrationsFolder := os.Getenv(envMigrations)
+
+	migrationsDir := "/srv/db/migrations" // default location
+	if dir := os.Getenv(envMigrations); dir != "" {
+		migrationsDir = os.Getenv(envMigrations)
+	}
 
 	debug, err := strconv.ParseBool(os.Getenv(envDebug))
 	if err != nil {
@@ -49,7 +53,7 @@ func main() {
 	masked := []string{tgAPIToken}
 	setupLog(debug, masked...)
 
-	log.Printf("[INFO start bot [Revision: %s, DBFile: %s, MigrationsFolder: %s, Debug: %t]", revision, dbFile, migrationsFolder, debug)
+	log.Printf("[INFO start bot [Revision: %s, DBFile: %s, MigrationsDir: %s, Debug: %t]", revision, dbFile, migrationsDir, debug)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
@@ -61,13 +65,13 @@ func main() {
 		cancel()
 	}()
 
-	if err = execute(ctx, dbFile, migrationsFolder, tgAPIToken, debug); err != nil {
+	if err = execute(ctx, dbFile, migrationsDir, tgAPIToken, debug); err != nil {
 		log.Printf("[ERROR] %v", err)
 		os.Exit(1)
 	}
 }
 
-func execute(ctx context.Context, dbFile, migrationsFolder, tgAPIToken string, debug bool) error {
+func execute(ctx context.Context, dbFile, migrationsDir, tgAPIToken string, debug bool) error {
 	botAPIEndpoint := os.Getenv(envTelegramBotAPIEndpoint)
 	if botAPIEndpoint == "" {
 		botAPIEndpoint = tbapi.APIEndpoint
@@ -84,7 +88,7 @@ func execute(ctx context.Context, dbFile, migrationsFolder, tgAPIToken string, d
 		return fmt.Errorf("can't connect to database: %w", err)
 	}
 
-	store, err := storage.NewSqllite(db, migrationsFolder)
+	store, err := storage.NewSqllite(db, migrationsDir)
 	if err != nil {
 		return fmt.Errorf("failed to connect to sqlite %s: %v", dbFile, err)
 	}
