@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	tbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/mezk/tg-reminder/internal/pkg/sender/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +15,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 		name     string
 		resp     BotResponse
 		opts     []BotResponseOption
-		setMocks func(r *assert.Assertions, botAPIMock *mocks.BotAPIMock)
+		setMocks func(r *assert.Assertions, botAPIMock *BotAPIMock)
 		expErr   string
 	}{
 		{
@@ -26,7 +25,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 				ReplyToMessageID: 4,
 				Text:             "Pipeline arts speakers realized choose aviation thong, adopt events switching info platforms units specialized, particular pants compatibility determines attachments pee assignment, licking tradition fool synthetic survivors denial alice.",
 			},
-			setMocks: func(a *assert.Assertions, botAPIMock *mocks.BotAPIMock) {
+			setMocks: func(a *assert.Assertions, botAPIMock *BotAPIMock) {
 				botAPIMock.SendFunc = func(c tbapi.Chattable) (tbapi.Message, error) {
 					a.Equal(tbapi.MessageConfig{
 						BaseChat: tbapi.BaseChat{
@@ -48,7 +47,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 				ReplyToMessageID: 4,
 				Text:             "Pipeline arts speakers realized choose aviation thong, adopt events switching info platforms units specialized, particular pants compatibility determines attachments pee assignment, licking tradition fool synthetic survivors denial alice.",
 			},
-			setMocks: func(a *assert.Assertions, botAPIMock *mocks.BotAPIMock) {
+			setMocks: func(a *assert.Assertions, botAPIMock *BotAPIMock) {
 				firstCall := true
 				botAPIMock.SendFunc = func(c tbapi.Chattable) (tbapi.Message, error) {
 					if firstCall {
@@ -76,7 +75,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 				ReplyToMessageID: 4,
 				Text:             "Pipeline arts speakers realized choose aviation thong, adopt events switching info platforms units specialized, particular pants compatibility determines attachments pee assignment, licking tradition fool synthetic survivors denial alice.",
 			},
-			setMocks: func(a *assert.Assertions, botAPIMock *mocks.BotAPIMock) {
+			setMocks: func(a *assert.Assertions, botAPIMock *BotAPIMock) {
 				botAPIMock.SendFunc = func(c tbapi.Chattable) (tbapi.Message, error) {
 					return tbapi.Message{}, errors.New("some internal error")
 				}
@@ -91,7 +90,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 				Text:             "Pipeline arts speakers realized choose aviation thong, adopt events switching info platforms units specialized, particular pants compatibility determines attachments pee assignment, licking tradition fool synthetic survivors denial alice.",
 			},
 			opts: []BotResponseOption{WithMyRemindersListEditButtons()},
-			setMocks: func(a *assert.Assertions, botAPIMock *mocks.BotAPIMock) {
+			setMocks: func(a *assert.Assertions, botAPIMock *BotAPIMock) {
 				botAPIMock.SendFunc = func(c tbapi.Chattable) (tbapi.Message, error) {
 					a.Equal(tbapi.MessageConfig{
 						BaseChat: tbapi.BaseChat{
@@ -120,7 +119,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 				Text:             "Pipeline arts speakers realized choose aviation thong, adopt events switching info platforms units specialized, particular pants compatibility determines attachments pee assignment, licking tradition fool synthetic survivors denial alice.",
 			},
 			opts: []BotResponseOption{WithReminderDatesButtons()},
-			setMocks: func(a *assert.Assertions, botAPIMock *mocks.BotAPIMock) {
+			setMocks: func(a *assert.Assertions, botAPIMock *BotAPIMock) {
 				botAPIMock.SendFunc = func(c tbapi.Chattable) (tbapi.Message, error) {
 					a.Equal(tbapi.MessageConfig{
 						BaseChat: tbapi.BaseChat{
@@ -157,7 +156,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 				Text:             "Pipeline arts speakers realized choose aviation thong, adopt events switching info platforms units specialized, particular pants compatibility determines attachments pee assignment, licking tradition fool synthetic survivors denial alice.",
 			},
 			opts: []BotResponseOption{WithReminderDoneButton(12345)},
-			setMocks: func(a *assert.Assertions, botAPIMock *mocks.BotAPIMock) {
+			setMocks: func(a *assert.Assertions, botAPIMock *BotAPIMock) {
 				botAPIMock.SendFunc = func(c tbapi.Chattable) (tbapi.Message, error) {
 					a.Equal(tbapi.MessageConfig{
 						BaseChat: tbapi.BaseChat{
@@ -197,7 +196,7 @@ func Test_botResponseSender_SendBotResponse(t *testing.T) {
 
 			// ARRANGE
 			a := assert.New(t)
-			botAPIMock := mocks.BotAPIMock{}
+			botAPIMock := BotAPIMock{}
 
 			if tc.setMocks != nil {
 				tc.setMocks(a, &botAPIMock)

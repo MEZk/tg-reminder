@@ -67,13 +67,13 @@ bin-deps:
 
 mocks:
 	find . -type f -name "*_mock.go" -exec rm {} \;
-	$(MOQ_BIN) --out internal/pkg/sender/mocks/botapi_mock.go --pkg mocks --skip-ensure --with-resets internal/pkg/sender BotAPI
-	$(MOQ_BIN) --out internal/pkg/notifier/mocks/storage_mock.go --pkg mocks --skip-ensure --with-resets internal/pkg/notifier Storage
-	$(MOQ_BIN) --out internal/pkg/notifier/mocks/sender_mock.go --pkg mocks --skip-ensure --with-resets internal/pkg/notifier BotResponseSender
-	$(MOQ_BIN) --out internal/pkg/listener/mocks/botapi_mock.go --pkg mocks --skip-ensure --with-resets internal/pkg/listener BotAPI
-	$(MOQ_BIN) --out internal/pkg/listener/mocks/updates_receiver_mock.go --pkg mocks --skip-ensure --with-resets internal/pkg/listener UpdateReceiver
-	$(MOQ_BIN) --out internal/pkg/bot/mocks/storage_mock.go --pkg mocks --skip-ensure --with-resets internal/pkg/bot Storage
-	$(MOQ_BIN) --out internal/pkg/bot/mocks/response_sender_mock.go --pkg mocks --skip-ensure --with-resets internal/pkg/bot ResponseSender
+	$(MOQ_BIN) --out internal/pkg/sender/zzz_botapi_test_mock.go --with-resets internal/pkg/sender BotAPI
+	$(MOQ_BIN) --out internal/pkg/notifier/zzz_storage_test_mock.go --with-resets internal/pkg/notifier Storage
+	$(MOQ_BIN) --out internal/pkg/notifier/zzz_sender_test_mock.go --with-resets internal/pkg/notifier BotResponseSender
+	$(MOQ_BIN) --out internal/pkg/listener/zzz_botapi_test_mock.go --with-resets internal/pkg/listener BotAPI
+	$(MOQ_BIN) --out internal/pkg/listener/zzz_updates_receiver_test_mock.go --with-resets internal/pkg/listener UpdateReceiver
+	$(MOQ_BIN) --out internal/pkg/bot/zzz_storage_test_mock.go --with-resets internal/pkg/bot Storage
+	$(MOQ_BIN) --out internal/pkg/bot/zzz_response_sender_test_mock.go --with-resets internal/pkg/bot ResponseSender
 
 lint:
 	$(GOLANGCI_BIN) run \
