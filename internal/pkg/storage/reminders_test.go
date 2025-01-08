@@ -25,22 +25,22 @@ func (s *storageTestSuite) Test_storage_DelayReminder() {
 		}
 
 		id, err := s.storage.SaveReminder(context.TODO(), reminder)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		// ACT
 		remindAt := timeNowUTC().Truncate(1 * time.Minute)
-		s.NoError(s.storage.DelayReminder(context.TODO(), id, remindAt))
+		s.Require().NoError(s.storage.DelayReminder(context.TODO(), id, remindAt))
 
 		// ASSERT
 		actReminder := s.mustGetReminder(id)
-		s.EqualValues(10, actReminder.AttemptsLeft)
-		s.Equal(remindAt, actReminder.RemindAt)
-		s.Equal(domain.ReminderStatusPending, actReminder.Status)
-		s.Greater(actReminder.ModifiedAt, reminder.ModifiedAt)
+		s.Require().EqualValues(10, actReminder.AttemptsLeft)
+		s.Require().Equal(remindAt, actReminder.RemindAt)
+		s.Require().Equal(domain.ReminderStatusPending, actReminder.Status)
+		s.Require().Greater(actReminder.ModifiedAt, reminder.ModifiedAt)
 	})
 
 	s.Run("error: not found", func() {
-		s.ErrorIs(s.storage.DelayReminder(context.TODO(), 2513, timeNowUTC()), ErrReminderNotFound)
+		s.Require().ErrorIs(s.storage.DelayReminder(context.TODO(), 2513, timeNowUTC()), ErrReminderNotFound)
 	})
 }
 
@@ -62,7 +62,7 @@ func (s *storageTestSuite) Test_storage_GetMyReminders() {
 			AttemptsLeft: 3,
 		}
 		_, err := s.storage.SaveReminder(context.TODO(), pendingReminder1)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		pendingReminder2 := domain.Reminder{
 			ChatID:       chatID,
@@ -75,7 +75,7 @@ func (s *storageTestSuite) Test_storage_GetMyReminders() {
 			AttemptsLeft: 3,
 		}
 		_, err = s.storage.SaveReminder(context.TODO(), pendingReminder2)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		doneReminder := domain.Reminder{
 			ChatID:       chatID,
@@ -88,10 +88,10 @@ func (s *storageTestSuite) Test_storage_GetMyReminders() {
 			AttemptsLeft: 3,
 		}
 		_, err = s.storage.SaveReminder(context.TODO(), doneReminder)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		actRemidners, err := s.storage.GetMyReminders(context.TODO(), userID, chatID)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		requireEqualRemindersList(s.Require(), []domain.Reminder{pendingReminder2, pendingReminder1}, actRemidners)
 	})
@@ -115,7 +115,7 @@ func (s *storageTestSuite) Test_storage_GetPendingReminders() {
 			AttemptsLeft: 3,
 		}
 		_, err := s.storage.SaveReminder(context.TODO(), pendingReminder1)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		pendingReminder2 := domain.Reminder{
 			ChatID:       chatID,
@@ -128,7 +128,7 @@ func (s *storageTestSuite) Test_storage_GetPendingReminders() {
 			AttemptsLeft: 3,
 		}
 		_, err = s.storage.SaveReminder(context.TODO(), pendingReminder2)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		doneReminder := domain.Reminder{
 			ChatID:       chatID,
@@ -141,16 +141,16 @@ func (s *storageTestSuite) Test_storage_GetPendingReminders() {
 			AttemptsLeft: 3,
 		}
 		_, err = s.storage.SaveReminder(context.TODO(), doneReminder)
-		s.NoError(err)
+		s.Require().NoError(err)
 
-		s.NoError(s.storage.SaveUser(context.TODO(), domain.User{
+		s.Require().NoError(s.storage.SaveUser(context.TODO(), domain.User{
 			ID:     userID,
 			Name:   "Danay Rodney",
 			Status: domain.UserStatusActive,
 		}))
 
 		reminders, err := s.storage.GetPendingReminders(context.TODO(), 2)
-		s.NoError(err)
+		s.Require().NoError(err)
 		requireEqualRemindersList(s.Require(), []domain.Reminder{pendingReminder1, pendingReminder2}, reminders)
 	})
 
@@ -180,8 +180,8 @@ func (s *storageTestSuite) Test_storage_GetPendingReminders() {
 		}))
 
 		reminders, err := s.storage.GetPendingReminders(context.TODO(), 2)
-		s.NoError(err)
-		s.Empty(reminders)
+		s.Require().NoError(err)
+		s.Require().Empty(reminders)
 	})
 
 	s.Run("success: user is not found", func() {
@@ -201,11 +201,11 @@ func (s *storageTestSuite) Test_storage_GetPendingReminders() {
 			AttemptsLeft: 3,
 		}
 		_, err := s.storage.SaveReminder(context.TODO(), pendingReminder1)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		reminders, err := s.storage.GetPendingReminders(context.TODO(), 2)
-		s.NoError(err)
-		s.Empty(reminders)
+		s.Require().NoError(err)
+		s.Require().Empty(reminders)
 	})
 }
 
@@ -253,7 +253,7 @@ func (s *storageTestSuite) Test_storage_SaveReminder() {
 			AttemptsLeft: 3,
 		}
 		id, err := s.storage.SaveReminder(context.TODO(), reminder)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		actRemidner := s.mustGetReminder(id)
 		requireEqualRemindersList(s.Require(), []domain.Reminder{reminder}, []domain.Reminder{actRemidner})
@@ -269,11 +269,11 @@ func (s *storageTestSuite) Test_storage_SaveReminder() {
 			AttemptsLeft: 3,
 		}
 		id, err := s.storage.SaveReminder(context.TODO(), reminder)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		actRemidner := s.mustGetReminder(id)
-		s.NotZero(actRemidner.CreatedAt)
-		s.NotZero(actRemidner.ModifiedAt)
+		s.Require().NotZero(actRemidner.CreatedAt)
+		s.Require().NotZero(actRemidner.ModifiedAt)
 	})
 }
 
@@ -319,7 +319,7 @@ func (s *storageTestSuite) Test_storage_UpdateReminder() {
 		}
 
 		id, err := s.storage.SaveReminder(context.TODO(), reminder)
-		s.NoError(err)
+		s.Require().NoError(err)
 
 		reminder.Status = domain.ReminderStatusDone
 		reminder.AttemptsLeft = 10
@@ -327,14 +327,14 @@ func (s *storageTestSuite) Test_storage_UpdateReminder() {
 		reminder.ModifiedAt = timeNowUTC().Truncate(1 * time.Minute)
 		reminder.ID = id
 
-		s.NoError(s.storage.UpdateReminder(context.TODO(), reminder))
+		s.Require().NoError(s.storage.UpdateReminder(context.TODO(), reminder))
 
 		actReminder := s.mustGetReminder(id)
-		s.Equal(reminder, actReminder)
+		s.Require().Equal(reminder, actReminder)
 	})
 
 	s.Run("error: not found", func() {
-		s.ErrorIs(s.storage.UpdateReminder(context.TODO(), domain.Reminder{ID: 35689}), ErrReminderNotFound)
+		s.Require().ErrorIs(s.storage.UpdateReminder(context.TODO(), domain.Reminder{ID: 35689}), ErrReminderNotFound)
 	})
 }
 

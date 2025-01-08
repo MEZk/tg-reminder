@@ -79,7 +79,7 @@ func TestReminder_FormatList(t *testing.T) {
 			expRes: "✅ *Foo bar baz*❗\n⏰ Сегодня 03:00\n#️⃣ 1",
 		},
 		{
-			name: "tommorow",
+			name: "tomorrow",
 			now:  jan1,
 			reminder: Reminder{
 				ID:       1,
@@ -91,8 +91,6 @@ func TestReminder_FormatList(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 

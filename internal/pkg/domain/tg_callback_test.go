@@ -21,6 +21,8 @@ func TestTgCallbackQuery_IsRemindAtButtonClick(t *testing.T) {
 }
 
 func TestTgCallbackQuery_RemindAt(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name   string
 		now    time.Time
@@ -71,6 +73,8 @@ func TestTgCallbackQuery_RemindAt(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
 			actRes, actErr := tc.query.RemindAt(tc.now)
 			assert.Equal(t, tc.expRes, actRes)
 			if tc.expErr != "" {
@@ -115,8 +119,6 @@ func TestTgCallbackQuery_ReminderID(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 

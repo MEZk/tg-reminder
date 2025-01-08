@@ -17,6 +17,7 @@ type storageTestSuite struct {
 	storage *Storage
 }
 
+//nolint:paralleltest // we clean db after each test, see TearDownSubTest
 func Test_StorageTestSuite(t *testing.T) {
 	suite.Run(t, new(storageTestSuite))
 }
@@ -44,7 +45,7 @@ func (s *storageTestSuite) SetupSuite() {
 }
 
 func (s *storageTestSuite) TearDownSuite() {
-	defer s.storage.db.Close()
+	s.storage.db.Close()
 }
 
 func (s *storageTestSuite) TearDownSubTest() {
