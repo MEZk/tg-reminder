@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
-	"github.com/mezk/tg-reminder/internal/pkg/notifier/mocks"
 	"github.com/mezk/tg-reminder/internal/pkg/sender"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +23,7 @@ func TestNotifier_Run(t *testing.T) {
 			chatID     int64 = 4568
 		)
 
-		senderMock := mocks.BotResponseSenderMock{
+		senderMock := BotResponseSenderMock{
 			SendBotResponseFunc: func(response sender.BotResponse, opts ...sender.BotResponseOption) error {
 				a := assert.New(t)
 
@@ -37,7 +36,7 @@ func TestNotifier_Run(t *testing.T) {
 				return nil
 			},
 		}
-		storageMock := mocks.StorageMock{
+		storageMock := StorageMock{
 			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
@@ -88,7 +87,7 @@ func TestNotifier_Run(t *testing.T) {
 			chatID     int64 = 4568
 		)
 
-		storageMock := mocks.StorageMock{
+		storageMock := StorageMock{
 			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return nil, errors.New("some error")
 			},
@@ -111,12 +110,12 @@ func TestNotifier_Run(t *testing.T) {
 			chatID     int64 = 4568
 		)
 
-		senderMock := mocks.BotResponseSenderMock{
+		senderMock := BotResponseSenderMock{
 			SendBotResponseFunc: func(response sender.BotResponse, opts ...sender.BotResponseOption) error {
 				return errors.New("some error")
 			},
 		}
-		storageMock := mocks.StorageMock{
+		storageMock := StorageMock{
 			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
@@ -157,7 +156,7 @@ func TestNotifier_Run(t *testing.T) {
 			chatID     int64 = 4568
 		)
 
-		senderMock := mocks.BotResponseSenderMock{
+		senderMock := BotResponseSenderMock{
 			SendBotResponseFunc: func(response sender.BotResponse, opts ...sender.BotResponseOption) error {
 				a := assert.New(t)
 
@@ -170,7 +169,7 @@ func TestNotifier_Run(t *testing.T) {
 				return nil
 			},
 		}
-		storageMock := mocks.StorageMock{
+		storageMock := StorageMock{
 			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{
@@ -205,7 +204,7 @@ func TestNotifier_Run(t *testing.T) {
 			chatID     int64 = 4568
 		)
 
-		senderMock := mocks.BotResponseSenderMock{
+		senderMock := BotResponseSenderMock{
 			SendBotResponseFunc: func(response sender.BotResponse, opts ...sender.BotResponseOption) error {
 				a := assert.New(t)
 
@@ -218,7 +217,7 @@ func TestNotifier_Run(t *testing.T) {
 				return nil
 			},
 		}
-		storageMock := mocks.StorageMock{
+		storageMock := StorageMock{
 			GetPendingRemindersFunc: func(ctx context.Context, limit int64) ([]domain.Reminder, error) {
 				return []domain.Reminder{
 					{

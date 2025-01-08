@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mezk/tg-reminder/internal/pkg/bot/mocks"
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
 	"github.com/mezk/tg-reminder/internal/pkg/sender"
 	"github.com/mezk/tg-reminder/internal/pkg/storage"
@@ -26,7 +25,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 		name     string
 		message  domain.TgCallbackQuery
 		now      time.Time
-		setMocks func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock)
+		setMocks func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock)
 		expErr   string
 	}{
 		// success
@@ -38,7 +37,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_reminder_done/12345",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -69,7 +68,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_remove_reminder",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -96,7 +95,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				Data:     "btn_delay_reminder/12345/1h",
 			},
 			now: time.Date(2024, 1, 1, 11, 1, 1, 0, time.UTC),
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -129,7 +128,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_remind_at/time/20:30",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					a.EqualValues(expUserID, userID)
 					return domain.BotState{
@@ -176,7 +175,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_edit_reminder",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -204,7 +203,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_reminder_done/12345",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					return nil
 				}
@@ -232,7 +231,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_reminder_done/12345",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					return dbError
 				}
@@ -250,7 +249,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_remove_reminder",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					return dbError
 				}
@@ -286,7 +285,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				Data:     "btn_delay_reminder/12345/1h",
 			},
 			now: time.Date(2024, 1, 1, 11, 1, 1, 0, time.UTC),
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.DelayReminderFunc = func(_ context.Context, id int64, remindAt time.Time) error {
 					return dbError
 				}
@@ -302,7 +301,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				Data:     "btn_delay_reminder/12345/1h",
 			},
 			now: time.Date(2024, 1, 1, 11, 1, 1, 0, time.UTC),
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					return dbError
 				}
@@ -331,7 +330,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_edit_reminder",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					return dbError
 				}
@@ -346,7 +345,7 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 				UserName: expUserName,
 				Data:     "btn_foo",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				responseSender.SendBotResponseFunc = func(response sender.BotResponse, _ ...sender.BotResponseOption) error {
 					a.Equal(sender.BotResponse{
 						ChatID: expChatID,
@@ -373,8 +372,8 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 			}
 
 			a := assert.New(t)
-			senderMock := &mocks.ResponseSenderMock{}
-			storeMock := &mocks.StorageMock{}
+			senderMock := &ResponseSenderMock{}
+			storeMock := &StorageMock{}
 			if tc.setMocks != nil {
 				tc.setMocks(a, senderMock, storeMock)
 			}
@@ -405,7 +404,7 @@ func TestBot_OnMessage(t *testing.T) {
 		name     string
 		message  domain.TgMessage
 		now      time.Time
-		setMocks func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock)
+		setMocks func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock)
 		expErr   string
 	}{
 		// commands
@@ -417,7 +416,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/start",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveUserFunc = func(_ context.Context, user domain.User) error {
 					a.Equal(domain.User{
 						ID:     expUserID,
@@ -451,7 +450,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/help",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -477,7 +476,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/create_reminder",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -503,7 +502,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/my_reminders",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetMyRemindersFunc = func(_ context.Context, userID int64, chatID int64) ([]domain.Reminder, error) {
 					a.Equal(expUserID, userID)
 					a.Equal(expChatID, chatID)
@@ -543,7 +542,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/enable_reminders",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -574,7 +573,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/disable_reminders",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					a.Equal(domain.BotState{
 						UserID: expUserID,
@@ -605,7 +604,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/my_reminders",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetMyRemindersFunc = func(_ context.Context, userID int64, chatID int64) ([]domain.Reminder, error) {
 					return nil, nil
 				}
@@ -630,7 +629,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "Punishment lawyer blank arrives luis deviant failing, grocery feb.",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					a.Equal(expUserID, userID)
 					return domain.BotState{
@@ -666,7 +665,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "2024-01-01 04:01",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -714,7 +713,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "12345",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -752,7 +751,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/foo-bar-baz",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					a.Equal(expUserID, userID)
 					return domain.BotState{
@@ -780,7 +779,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/start",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveUserFunc = func(_ context.Context, user domain.User) error {
 					return storage.ErrUserAlreadyExists
 				}
@@ -809,7 +808,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/start",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveUserFunc = func(_ context.Context, user domain.User) error {
 					return errors.New("db error")
 				}
@@ -824,7 +823,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/start",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveUserFunc = func(_ context.Context, user domain.User) error {
 					return storage.ErrUserAlreadyExists
 				}
@@ -842,7 +841,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/help",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					return errors.New("db error")
 				}
@@ -857,7 +856,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/create_reminder",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SaveBotStateFunc = func(_ context.Context, botState domain.BotState) error {
 					return errors.New("db error")
 				}
@@ -872,7 +871,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/my_reminders",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetMyRemindersFunc = func(_ context.Context, userID int64, chatID int64) ([]domain.Reminder, error) {
 					return nil, errors.New("db error")
 				}
@@ -887,7 +886,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "/enable_reminders",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.SetUserStatusFunc = func(_ context.Context, id int64, status domain.UserStatus) error {
 					return errors.New("db error")
 				}
@@ -903,7 +902,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "Punishment lawyer blank arrives luis deviant failing, grocery feb.",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					a.Equal(expUserID, userID)
 					return domain.BotState{
@@ -926,7 +925,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "foo",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -955,7 +954,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "foo",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -973,7 +972,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "12345",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -1010,7 +1009,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "12345",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -1032,7 +1031,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "12345",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -1059,7 +1058,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "Punishment lawyer blank arrives luis deviant failing, grocery feb.",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{}, dbError
 				}
@@ -1074,7 +1073,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "Punishment lawyer blank arrives luis deviant failing, grocery feb.",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -1099,7 +1098,7 @@ func TestBot_OnMessage(t *testing.T) {
 				UserName: expUserName,
 				Text:     "foo",
 			},
-			setMocks: func(a *assert.Assertions, responseSender *mocks.ResponseSenderMock, store *mocks.StorageMock) {
+			setMocks: func(a *assert.Assertions, responseSender *ResponseSenderMock, store *StorageMock) {
 				store.GetBotStateFunc = func(_ context.Context, userID int64) (domain.BotState, error) {
 					return domain.BotState{
 						UserID: expUserID,
@@ -1126,8 +1125,8 @@ func TestBot_OnMessage(t *testing.T) {
 			}
 
 			a := assert.New(t)
-			senderMock := &mocks.ResponseSenderMock{}
-			storeMock := &mocks.StorageMock{}
+			senderMock := &ResponseSenderMock{}
+			storeMock := &StorageMock{}
 			if tc.setMocks != nil {
 				tc.setMocks(a, senderMock, storeMock)
 			}

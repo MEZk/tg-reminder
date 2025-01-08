@@ -8,7 +8,6 @@ import (
 
 	tbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
-	"github.com/mezk/tg-reminder/internal/pkg/listener/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +17,7 @@ func Test_listener_Listen(t *testing.T) {
 	t.Run("success: message", func(t *testing.T) {
 		t.Parallel()
 
-		botAPIMock := mocks.BotAPIMock{
+		botAPIMock := BotAPIMock{
 			GetUpdatesChanFunc: func(config tbapi.UpdateConfig) tbapi.UpdatesChannel {
 				cfg := tbapi.NewUpdate(0)
 				cfg.Timeout = 60
@@ -41,7 +40,7 @@ func Test_listener_Listen(t *testing.T) {
 				return ch
 			},
 		}
-		updateReceiverMock := mocks.UpdateReceiverMock{
+		updateReceiverMock := UpdateReceiverMock{
 			OnMessageFunc: func(_ context.Context, message domain.TgMessage) error {
 				assert.Equal(t, domain.TgMessage{
 					ChatID:   1,
@@ -64,7 +63,7 @@ func Test_listener_Listen(t *testing.T) {
 	t.Run("success: callback", func(t *testing.T) {
 		t.Parallel()
 
-		botAPIMock := mocks.BotAPIMock{
+		botAPIMock := BotAPIMock{
 			GetUpdatesChanFunc: func(config tbapi.UpdateConfig) tbapi.UpdatesChannel {
 				cfg := tbapi.NewUpdate(0)
 				cfg.Timeout = 60
@@ -89,7 +88,7 @@ func Test_listener_Listen(t *testing.T) {
 				return ch
 			},
 		}
-		updateReceiverMock := mocks.UpdateReceiverMock{
+		updateReceiverMock := UpdateReceiverMock{
 			OnCallbackQueryFunc: func(_ context.Context, callback domain.TgCallbackQuery) error {
 				assert.Equal(t, domain.TgCallbackQuery{
 					ChatID:   1,
@@ -112,7 +111,7 @@ func Test_listener_Listen(t *testing.T) {
 	t.Run("updates chan is closed", func(t *testing.T) {
 		t.Parallel()
 
-		botAPIMock := mocks.BotAPIMock{
+		botAPIMock := BotAPIMock{
 			GetUpdatesChanFunc: func(config tbapi.UpdateConfig) tbapi.UpdatesChannel {
 				cfg := tbapi.NewUpdate(0)
 				cfg.Timeout = 60
@@ -135,7 +134,7 @@ func Test_listener_Listen(t *testing.T) {
 	t.Run("can't process update", func(t *testing.T) {
 		t.Parallel()
 
-		botAPIMock := mocks.BotAPIMock{
+		botAPIMock := BotAPIMock{
 			GetUpdatesChanFunc: func(config tbapi.UpdateConfig) tbapi.UpdatesChannel {
 				cfg := tbapi.NewUpdate(0)
 				cfg.Timeout = 60
@@ -158,7 +157,7 @@ func Test_listener_Listen(t *testing.T) {
 				return ch
 			},
 		}
-		updateReceiverMock := mocks.UpdateReceiverMock{
+		updateReceiverMock := UpdateReceiverMock{
 			OnMessageFunc: func(_ context.Context, message domain.TgMessage) error {
 				return errors.New("can't process update")
 			},
