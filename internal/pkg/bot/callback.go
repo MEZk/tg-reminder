@@ -3,7 +3,6 @@ package bot
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
@@ -40,11 +39,6 @@ func (b *Bot) onRemoveReminderButton(ctx context.Context, callback domain.TgCall
 }
 
 func (b *Bot) onDelayReminderButton(ctx context.Context, callback domain.TgCallbackQuery) error {
-	data, ok := strings.CutPrefix(callback.Data, domain.ButtonDataPrefixDelayReminder)
-	if !ok {
-		return fmt.Errorf("invalid delay duration format: %s", data)
-	}
-
 	reminderID, err := callback.ReminderID()
 	if err != nil {
 		return fmt.Errorf("can't parse reminderID: %w", err)

@@ -39,6 +39,27 @@ func (s *storageTestSuite) Test_storage_DelayReminder() {
 		s.Require().Greater(actReminder.ModifiedAt, reminder.ModifiedAt)
 	})
 
+	s.Run("error: reminder status is done", func() {
+		// ARRANGE
+		reminder := domain.Reminder{
+			ChatID:       2,
+			UserID:       3,
+			Text:         "Thin chevy wiring sort imperial recommendations key, roster naval cornwall engine broken. ",
+			CreatedAt:    timeNowUTC().Truncate(1 * time.Minute),
+			ModifiedAt:   timeNowUTC().Truncate(1 * time.Minute),
+			RemindAt:     timeNowUTC().Truncate(1 * time.Minute),
+			Status:       domain.ReminderStatusDone,
+			AttemptsLeft: 3,
+		}
+
+		id, err := s.storage.SaveReminder(context.TODO(), reminder)
+		s.Require().NoError(err)
+
+		// ACT & ASSERT
+		remindAt := timeNowUTC().Truncate(1 * time.Minute)
+		s.Require().ErrorIs(s.storage.DelayReminder(context.TODO(), id, remindAt), ErrReminderNotFound)
+	})
+
 	s.Run("error: not found", func() {
 		s.Require().ErrorIs(s.storage.DelayReminder(context.TODO(), 2513, timeNowUTC()), ErrReminderNotFound)
 	})
