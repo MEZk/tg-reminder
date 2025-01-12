@@ -313,6 +313,17 @@ func TestBot_OnCallbackQuery(t *testing.T) {
 			expErr: dbError.Error(),
 		},
 		{
+			name: "error: delay reminder button, can't parse interval",
+			message: domain.TgCallbackQuery{
+				ChatID:   expChatID,
+				UserID:   expUserID,
+				UserName: expUserName,
+				Data:     "btn_delay_reminder/12345/fooBarBaz",
+			},
+			now:    time.Date(2024, 1, 1, 11, 1, 1, 0, time.UTC),
+			expErr: `can't parse delay: failed to parse remindAt duration: time: invalid duration "fooBarBaz"`,
+		},
+		{
 			name: "error: remind at button",
 			now:  time.Date(2024, 1, 1, 1, 1, 1, 0, time.UTC),
 			message: domain.TgCallbackQuery{

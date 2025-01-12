@@ -187,7 +187,7 @@ func (s *Storage) SetReminderStatus(ctx context.Context, id int64, status domain
 
 // DelayReminder - delays reminder by id. Reminder will be fired at remindAt time.
 func (s *Storage) DelayReminder(ctx context.Context, id int64, remindAt time.Time) error {
-	const query = "UPDATE reminders SET remind_at = $1, attempts_left = $2, modified_at = $3 WHERE id = $4;"
+	const query = "UPDATE reminders SET remind_at = $1, attempts_left = $2, modified_at = $3 WHERE id = $4 AND status = 'pending';"
 
 	res, err := s.db.ExecContext(ctx, query, remindAt, domain.DefaultAttemptsLeft, timeNowUTC(), id)
 	if err != nil {
