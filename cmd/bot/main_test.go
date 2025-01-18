@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"os/exec"
+	"path"
 	"strings"
 	"sync/atomic"
 	"syscall"
@@ -19,60 +19,40 @@ import (
 	tbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/jmoiron/sqlx"
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 const (
-	testChatID    = 32467
-	testUserID    = 345757
-	testUserName  = "JohnDoe"
-	testAPIToken  = "e30637b8-8d51-457d-b8e4-0eee79e3cf5c"
-	migrationsDir = "../../migrations"
+	testChatID   = 32467
+	testUserID   = 345757
+	testUserName = "JohnDoe"
 )
 
-//nolint:testifylint // TODO: fix test, it does not work. See https://github.com/MEZk/tg-reminder/issues/25
-func Test_main(t *testing.T) {
-	t.Run("success: start bot, create db, send getMe, getUpdates, sendMessage requests", func(t *testing.T) {
+func Test_execute(t *testing.T) {
+	const (
+		testAPIToken  = "e30637b8-8d51-457d-b8e4-0eee79e3cf5c"
+		migrationsDir = "../../migrations"
+		envForkedTest = "FORK"
+		botID         = "/bot" + testAPIToken
+	)
+
+	t.Run("success: start bot, create db, make db backup, send getMe, getUpdates, sendMessage requests to Telegram", func(t *testing.T) {
 		r := require.New(t)
 
-		if os.Getenv("CTX_CANCEL") != "1" {
-			cmd := exec.Command(os.Args[0], "-test.run=Test_main")
-			cmd.Env = append(os.Environ(), "CTX_CANCEL=1")
-			stdout, _ := cmd.StderrPipe()
-			if err := cmd.Start(); err != nil {
-				t.Fatal(err)
-			}
-
-			gotBytes, _ := io.ReadAll(stdout)
-			r.Contains(string(gotBytes), "[ERROR] context canceled")
-
-			err := cmd.Wait()
-			if e, ok := err.(*exec.ExitError); !ok || e.Success() {
-				r.FailNowf("process ran with err %s, want exit status 1", err.Error())
-			}
-			return
-		}
-
-		f, err := os.CreateTemp("", "test-db")
+		// ARRANGE
+		tempDir := t.TempDir()
+		f, err := os.CreateTemp(tempDir, "test-db")
 		if err != nil {
-			t.Fatal(err)
+			r.NoError(err)
 		}
-
-		dbFilename := f.Name()
-
-		defer func() {
-			f.Close()
-			os.Remove(dbFilename)
-		}()
-
-		t.Setenv(envMigrations, migrationsDir)
-		t.Setenv(envDebug, "false")
-		t.Setenv(envTelegramAPIToken, testAPIToken)
-		t.Setenv(envDBFile, dbFilename)
 
 		var (
-			withUpdates        atomic.Bool
-			testUser           = tbapi.User{ID: testUserID, UserName: testUserName}
+			dbFile      = f.Name()
+			dbBackupDir = path.Join(tempDir, "db_backup")
+
+			testUser = tbapi.User{ID: testUserID, UserName: testUserName}
+
 			testUserJSON, _    = json.Marshal(testUser)
 			testUpdatesJSON, _ = json.Marshal([]tbapi.Update{
 				{
@@ -87,64 +67,112 @@ func Test_main(t *testing.T) {
 				MessageID: 1,
 				From:      &testUser,
 			})
-		)
-		withUpdates.Store(true)
 
-		tgTestServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			r.Equal(http.MethodPost, req.Method)
+			hasUpdates  atomic.Bool
+			hasMessages atomic.Bool
+		)
+		hasUpdates.Store(true)
+		hasMessages.Store(true)
+
+		tgAPIServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			a := assert.New(t)
+
 			switch {
 			case strings.HasSuffix(req.URL.Path, "getMe"):
-				r.Equal("/bot"+testAPIToken+"/getMe", req.URL.Path)
-				writeTgServerResponse(w, tbapi.APIResponse{Ok: true, Result: testUserJSON})
+				a.Equal(botID+"/getMe", req.URL.Path)
+				writeTgServerResp(t, w, tbapi.APIResponse{Ok: true, Result: testUserJSON})
 			case strings.HasSuffix(req.URL.Path, "getUpdates"):
-				r.Equal("/bot"+testAPIToken+"/getUpdates", req.URL.Path)
-				if withUpdates.Load() {
-					writeTgServerResponse(w, tbapi.APIResponse{Ok: true, Result: testUpdatesJSON})
+				a.Equal(botID+"/getUpdates", req.URL.Path)
+
+				if hasUpdates.Load() {
+					writeTgServerResp(t, w, tbapi.APIResponse{Ok: true, Result: testUpdatesJSON})
+					hasUpdates.Store(false)
 				} else {
-					writeTgServerResponse(w, tbapi.APIResponse{Ok: true, Result: nil})
+					writeTgServerResp(t, w, tbapi.APIResponse{Ok: true, Result: nil})
 				}
-				// do not send update after first response
-				withUpdates.Store(false)
 			case strings.HasSuffix(req.URL.Path, "sendMessage"):
-				r.Equal("/bot"+testAPIToken+"/sendMessage", req.URL.Path)
-				checkSendMessageBody(r, req.Body)
-				writeTgServerResponse(w, tbapi.APIResponse{Ok: true, Result: testMessageJSON})
+				a.Equal(botID+"/sendMessage", req.URL.Path)
+
+				var body []byte
+				body, err = io.ReadAll(req.Body)
+				a.NoError(err)
+
+				var actMsg string
+				actMsg, err = url.QueryUnescape(string(body))
+				a.NoError(err)
+
+				const expMsg = `chat_id=32467&disable_web_page_preview=true&entities=null&parse_mode=Markdown&text=*Привет,* @JohnDoe 👋
+
+Теперь вы можете со мной работать.
+Для справки 💁 используйте команду /help`
+
+				a.Equal(expMsg, actMsg)
+
+				if hasMessages.Load() {
+					writeTgServerResp(t, w, tbapi.APIResponse{Ok: true, Result: testMessageJSON})
+					hasMessages.Store(false)
+				} else {
+					writeTgServerResp(t, w, tbapi.APIResponse{Ok: true, Result: nil})
+				}
 			default:
-				r.Failf("unknown request url path: %s", req.URL.Path)
+				a.Failf("unknown request url path: %s", req.URL.Path)
 			}
 		}))
-		defer tgTestServer.Close()
 
-		// https://api.telegram.org/bot%s/%s
-		apiEndpoint := tgTestServer.URL + "/bot%s/%s"
-		t.Setenv(envTelegramBotAPIEndpoint, apiEndpoint)
+		t.Setenv(envTelegramBotAPIEndpoint, tgAPIServer.URL+"/bot%s/%s") // https://api.telegram.org/bot%s/%s
+		t.Setenv(envMigrations, migrationsDir)
+		t.Setenv(envDebug, "false")
+		t.Setenv(envTelegramAPIToken, testAPIToken)
+		t.Setenv(envDBFile, dbFile)
+		t.Setenv(envBackupDir, dbBackupDir)
+		t.Setenv(envBackupInterval, "700ms") // shpuld be less then sigIntTimeout, we expect exactly 1 backup before SIGINT signal
+		t.Setenv(envBackupRetention, "2s")
 
+		t.Cleanup(func() {
+			f.Close()
+			tgAPIServer.Close()
+		})
+
+		done := make(chan bool)
+		// Send SIGINT after sigIntTimeout to stop execution
 		const sigIntTimeout = 1 * time.Second
-
 		go func() {
 			ticker := time.NewTicker(sigIntTimeout)
 			<-ticker.C
-			checkDBTables(r, dbFilename)
 			syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+			done <- true
+			close(done)
 		}()
 
-		r.NotPanics(main)
+		// ACT
+		err = execute()
+
+		// ASSERT
+		r.ErrorIs(err, context.Canceled)
+		r.True(<-done)
+		checkDBStateAfterExecute(r, dbFile)
+
+		backupDirEntries, err := os.ReadDir(dbBackupDir)
+		r.NoError(err)
+		r.Len(backupDirEntries, 1)
 	})
 }
 
-func writeTgServerResponse(w http.ResponseWriter, resp tbapi.APIResponse) {
+func writeTgServerResp(t *testing.T, w http.ResponseWriter, resp tbapi.APIResponse) {
+	t.Helper()
+
 	w.WriteHeader(http.StatusOK)
 	b, _ := json.Marshal(resp)
 	fmt.Fprint(w, string(b))
 }
 
-func checkDBTables(r *require.Assertions, dbFile string) {
+func checkDBStateAfterExecute(r *require.Assertions, dbFile string) {
 	db, err := sqlx.Connect("sqlite", dbFile)
 	if err != nil {
 		r.NoError(err)
 	}
 
-	const query = `
+	const getTablesQuery = `
 		SELECT name 
 		FROM sqlite_schema
 		WHERE 
@@ -152,7 +180,7 @@ func checkDBTables(r *require.Assertions, dbFile string) {
 			name NOT LIKE 'sqlite_%';`
 
 	var tables []string
-	r.NoError(db.Select(&tables, query))
+	r.NoError(db.Select(&tables, getTablesQuery))
 
 	exTables := []string{
 		"goose_db_version",
@@ -173,18 +201,4 @@ func checkDBTables(r *require.Assertions, dbFile string) {
 	var state domain.BotState
 	r.NoError(db.Get(&state, getBotStateQuery, testUserID))
 	r.EqualValues(domain.BotStateNameStart, state.Name)
-}
-
-func checkSendMessageBody(r *require.Assertions, body io.ReadCloser) {
-	var buf bytes.Buffer
-	_, err := buf.ReadFrom(body)
-	r.NoError(err)
-
-	const expMsg = `chat_id=32467&disable_web_page_preview=true&entities=null&parse_mode=Markdown&text=Привет, @JohnDoe!
-Теперь ты можешь со мной работать.
-Для справки используй команду /help.`
-
-	actMsg, err := url.QueryUnescape(buf.String())
-	r.NoError(err)
-	r.Equal(expMsg, actMsg)
 }
