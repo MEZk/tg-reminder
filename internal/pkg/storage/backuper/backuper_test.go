@@ -139,10 +139,7 @@ func TestBackuper_Run(t *testing.T) {
 		b.Run(ctx)
 
 		backupDirEntries, err := os.ReadDir(backupDir)
-		if err != nil {
-			r.FailNow(err.Error())
-		}
-
+		r.NoError(err)
 		r.Len(backupDirEntries, 1)
 
 		backupTimePrefix, ok := strings.CutSuffix(backupDirEntries[0].Name(), backupFileExtension)

@@ -37,6 +37,13 @@ var revision = "local"
 func main() {
 	fmt.Printf("tg-reminder %s\n", revision)
 
+	if err := execute(); err != nil {
+		log.Printf("[ERROR] %v", err)
+		os.Exit(1)
+	}
+}
+
+func execute() error {
 	dbFile := os.Getenv(envDBFile)
 
 	migrationsDir := "/srv/db/migrations" // default location
@@ -46,32 +53,17 @@ func main() {
 
 	debug, err := strconv.ParseBool(os.Getenv(envDebug))
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("fail to parse %s env variable: %w", envDebug, err)
 	}
 
 	tgAPIToken := os.Getenv(envTelegramAPIToken)
 	masked := []string{tgAPIToken}
-	setupLog(debug, masked...)
+	if err = setupLog(debug, masked...); err != nil {
+		return fmt.Errorf("fail to setup logger: %w", err)
+	}
 
 	log.Printf("[INFO start bot [Revision: %s, DBFile: %s, MigrationsDir: %s, Debug: %t]", revision, dbFile, migrationsDir, debug)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	go func() {
-		// catch signal and invoke graceful termination
-		stop := make(chan os.Signal, 1)
-		signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-		<-stop
-		log.Printf("[WARN] interrupt signal")
-		cancel()
-	}()
-
-	if err = execute(ctx, dbFile, migrationsDir, tgAPIToken, debug); err != nil {
-		log.Printf("[ERROR] %v", err)
-		os.Exit(1)
-	}
-}
-
-func execute(ctx context.Context, dbFile, migrationsDir, tgAPIToken string, debug bool) error {
 	botAPIEndpoint := os.Getenv(envTelegramBotAPIEndpoint)
 	if botAPIEndpoint == "" {
 		botAPIEndpoint = tbapi.APIEndpoint
@@ -92,6 +84,16 @@ func execute(ctx context.Context, dbFile, migrationsDir, tgAPIToken string, debu
 	if err != nil {
 		return fmt.Errorf("failed to connect to sqlite %s: %v", dbFile, err)
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		// catch signal and invoke graceful termination
+		stop := make(chan os.Signal, 1)
+		signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+		<-stop
+		log.Printf("[WARN] interrupt signal")
+		cancel()
+	}()
 
 	if backupDir := os.Getenv(envBackupDir); backupDir != "" {
 		var backupRetentionInterval time.Duration
@@ -130,7 +132,7 @@ func execute(ctx context.Context, dbFile, migrationsDir, tgAPIToken string, debu
 	return tgUpdatesListener.Listen(ctx)
 }
 
-func setupLog(dbg bool, secrets ...string) {
+func setupLog(dbg bool, secrets ...string) error {
 	logOpts := []log.Option{log.Msec, log.LevelBraces, log.StackTraceOnError}
 	if dbg {
 		logOpts = []log.Option{log.Debug, log.CallerFile, log.CallerFunc, log.Msec, log.LevelBraces, log.StackTraceOnError}
@@ -152,7 +154,10 @@ func setupLog(dbg bool, secrets ...string) {
 
 	log.SetupStdLogger(logOpts...)
 	log.Setup(logOpts...)
+
 	if err := tbapi.SetLogger(log.ToStdLogger(log.Default(), "DEBUG tbapi ----")); err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
