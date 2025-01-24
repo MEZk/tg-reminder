@@ -1,11 +1,16 @@
 module github.com/mezk/tg-reminder
 
-go 1.22.1
+go 1.23.0
+
+toolchain go1.23.5
 
 require (
 	github.com/fatih/color v1.18.0
 	github.com/go-pkgz/lgr v0.11.1
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
+	github.com/go-telegram/bot v1.13.3
+	github.com/go-telegram/fsm v0.2.0
+	github.com/go-telegram/ui v0.4.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/markusmobius/go-dateparser v1.2.3
 	github.com/pressly/goose/v3 v3.24.0

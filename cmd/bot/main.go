@@ -7,18 +7,13 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
-	"time"
 
 	"github.com/fatih/color"
 	log "github.com/go-pkgz/lgr"
 	tbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/jmoiron/sqlx"
-	"github.com/mezk/tg-reminder/internal/pkg/bot"
-	"github.com/mezk/tg-reminder/internal/pkg/listener"
-	"github.com/mezk/tg-reminder/internal/pkg/notifier"
-	"github.com/mezk/tg-reminder/internal/pkg/sender"
+	bot_v2 "github.com/mezk/tg-reminder/internal/pkg/bot/v2"
 	"github.com/mezk/tg-reminder/internal/pkg/storage"
-	"github.com/mezk/tg-reminder/internal/pkg/storage/backuper"
 )
 
 const (
@@ -44,13 +39,6 @@ func main() {
 }
 
 func execute() error {
-	dbFile := os.Getenv(envDBFile)
-
-	migrationsDir := "/srv/db/migrations" // default location
-	if dir := os.Getenv(envMigrations); dir != "" {
-		migrationsDir = os.Getenv(envMigrations)
-	}
-
 	debug, err := strconv.ParseBool(os.Getenv(envDebug))
 	if err != nil {
 		return fmt.Errorf("fail to parse %s env variable: %w", envDebug, err)
@@ -62,18 +50,12 @@ func execute() error {
 		return fmt.Errorf("fail to setup logger: %w", err)
 	}
 
-	log.Printf("[INFO start bot [Revision: %s, DBFile: %s, MigrationsDir: %s, Debug: %t]", revision, dbFile, migrationsDir, debug)
+	dbFile := os.Getenv(envDBFile)
 
-	botAPIEndpoint := os.Getenv(envTelegramBotAPIEndpoint)
-	if botAPIEndpoint == "" {
-		botAPIEndpoint = tbapi.APIEndpoint
+	migrationsDir := "/srv/db/migrations" // default location
+	if dir := os.Getenv(envMigrations); dir != "" {
+		migrationsDir = os.Getenv(envMigrations)
 	}
-
-	botAPI, err := tbapi.NewBotAPIWithAPIEndpoint(tgAPIToken, botAPIEndpoint)
-	if err != nil {
-		return fmt.Errorf("can't connect to telegram bot api: %w", err)
-	}
-	botAPI.Debug = debug
 
 	db, err := sqlx.Connect("sqlite", dbFile)
 	if err != nil {
@@ -95,41 +77,66 @@ func execute() error {
 		cancel()
 	}()
 
-	if backupDir := os.Getenv(envBackupDir); backupDir != "" {
-		var backupRetentionInterval time.Duration
-		if backupRetentionInterval, err = time.ParseDuration(os.Getenv(envBackupRetention)); err != nil {
-			return fmt.Errorf("can't parse backup retention interval: %w", err)
-		}
-
-		var backupInterval time.Duration
-		if backupInterval, err = time.ParseDuration(os.Getenv(envBackupInterval)); err != nil {
-			return fmt.Errorf("can't parse backup interval: %w", err)
-		}
-
-		var backup *backuper.Backuper
-		if backup, err = backuper.New(db, backupDir, backupInterval, backupRetentionInterval); err != nil {
-			return fmt.Errorf("can't create backuper: %w", err)
-		}
-		// backuper starts in background goroutine
-		go func() {
-			backup.Run(ctx)
-		}()
+	app, err := bot_v2.New(ctx, store, tgAPIToken, debug)
+	if err != nil {
+		return fmt.Errorf("can't create bot: %w", err)
 	}
 
-	tgMessageSender := sender.New(botAPI)
+	app.Start(ctx)
+	log.Printf("[INFO start bot [Revision: %s, DBFile: %s, MigrationsDir: %s, Debug: %t]", revision, dbFile, migrationsDir, debug)
 
-	reminderBot := bot.New(tgMessageSender, store)
+	return nil
 
-	tgUpdatesListener := listener.New(botAPI, reminderBot)
+	//
+	// botAPIEndpoint := os.Getenv(envTelegramBotAPIEndpoint)
+	// if botAPIEndpoint == "" {
+	// 	botAPIEndpoint = tbapi.APIEndpoint
+	// }
+	//
+	// botAPI, err := tbapi.NewBotAPIWithAPIEndpoint(tgAPIToken, botAPIEndpoint)
+	// if err != nil {
+	// 	return fmt.Errorf("can't connect to telegram bot api: %w", err)
+	// }
+	// botAPI.Debug = debug
+	//
 
-	notificationSender := notifier.New(tgMessageSender, store, 1*time.Minute)
-	// notifications sender starts in background goroutine
-	go func() {
-		notificationSender.Run(ctx)
-	}()
-
-	// Listen is a blocking call
-	return tgUpdatesListener.Listen(ctx)
+	//
+	//
+	// if backupDir := os.Getenv(envBackupDir); backupDir != "" {
+	// 	var backupRetentionInterval time.Duration
+	// 	if backupRetentionInterval, err = time.ParseDuration(os.Getenv(envBackupRetention)); err != nil {
+	// 		return fmt.Errorf("can't parse backup retention interval: %w", err)
+	// 	}
+	//
+	// 	var backupInterval time.Duration
+	// 	if backupInterval, err = time.ParseDuration(os.Getenv(envBackupInterval)); err != nil {
+	// 		return fmt.Errorf("can't parse backup interval: %w", err)
+	// 	}
+	//
+	// 	var backup *backuper.Backuper
+	// 	if backup, err = backuper.New(db, backupDir, backupInterval, backupRetentionInterval); err != nil {
+	// 		return fmt.Errorf("can't create backuper: %w", err)
+	// 	}
+	// 	// backuper starts in background goroutine
+	// 	go func() {
+	// 		backup.Run(ctx)
+	// 	}()
+	// }
+	//
+	// tgMessageSender := sender.New(botAPI)
+	//
+	// reminderBot := bot.New(tgMessageSender, store)
+	//
+	// tgUpdatesListener := listener.New(botAPI, reminderBot)
+	//
+	// notificationSender := notifier.New(tgMessageSender, store, 1*time.Minute)
+	// // notifications sender starts in background goroutine
+	// go func() {
+	// 	notificationSender.Run(ctx)
+	// }()
+	//
+	// // Listen is a blocking call
+	// return tgUpdatesListener.Listen(ctx)
 }
 
 func setupLog(dbg bool, secrets ...string) error {

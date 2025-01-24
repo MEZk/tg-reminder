@@ -14,6 +14,12 @@ github.com/go-sql-driver/mysql v1.8.1 h1:LedoTUt/eveggdHS9qUFC1EFSa8bU2+1pZjSRpv
 github.com/go-sql-driver/mysql v1.8.1/go.mod h1:wEBSXgmK//2ZFJyE+qWnIsVGmvmEKlqwuVSjsCm7DZg=
 github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1 h1:wG8n/XJQ07TmjbITcGiUaOtXxdrINDz1b0J1w0SzqDc=
 github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1/go.mod h1:A2S0CWkNylc2phvKXWBBdD3K0iGnDBGbzRpISP2zBl8=
+github.com/go-telegram/bot v1.13.3 h1:r2erpHI5rMQsR5TFWJ/XVqWHq9R228fcaejLFvXJsmM=
+github.com/go-telegram/bot v1.13.3/go.mod h1:i2TRs7fXWIeaceF3z7KzsMt/he0TwkVC680mvdTFYeM=
+github.com/go-telegram/fsm v0.2.0 h1:Y9bG3SMouBQzBaT/HFhwvmnLZEgYkBPQHnKNZt0szO8=
+github.com/go-telegram/fsm v0.2.0/go.mod h1:NTRDcTWUMJym2K67nBHjNrKO7oYm8/XNlU2cDs6Z3s0=
+github.com/go-telegram/ui v0.4.1 h1:5LECUkzjKuhmW3YMACYFzHD1h1+XUMMS42SN+Fl91is=
+github.com/go-telegram/ui v0.4.1/go.mod h1:Ze99WRnNvRNmZHgyhxH+mb8OhGnptFFsz0F6L2XQcIc=
 github.com/google/pprof v0.0.0-20240409012703-83162a5b38cd h1:gbpYu9NMq8jhDVbvlGkMFWCjLFlqqEZjEmObmhUy6Vo=
 github.com/google/pprof v0.0.0-20240409012703-83162a5b38cd/go.mod h1:kf6iHlnVGwgKolg33glAes7Yg/8iWP8ukqeldJSO7jw=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
