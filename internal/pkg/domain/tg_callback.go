@@ -30,6 +30,9 @@ const (
 	ButtonDataEditReminder = "btn_edit_reminder"
 	// ButtonDataRemoveReminder - [domain.TgCallbackQuery] data for remove reminder button.
 	ButtonDataRemoveReminder = "btn_remove_reminder"
+
+	ButtonDataEditReminderText = "btn_edit_text"
+	ButtonDataEditReminderDate = "btn_edit_date"
 )
 
 // IsButtonClick returns true, if callback query is a known button click.

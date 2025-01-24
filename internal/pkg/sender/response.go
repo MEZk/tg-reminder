@@ -14,6 +14,7 @@ type BotResponse struct {
 	showMyReminderListEditButtons bool
 	showReminderDatesButtons      bool
 	showReminderDoneButtons       bool
+	showReminderEditButtons       bool
 	reminderID                    int64
 }
 
@@ -40,6 +41,13 @@ func WithReminderDoneButton(reminderID int64) BotResponseOption {
 	return func(r *BotResponse) {
 		r.showReminderDoneButtons = true
 		r.reminderID = reminderID
+	}
+}
+
+// WithReminderEditButtons - show remidner edit buttons (edit text, edit date).
+func WithReminderEditButtons() BotResponseOption {
+	return func(r *BotResponse) {
+		r.showReminderEditButtons = true
 	}
 }
 

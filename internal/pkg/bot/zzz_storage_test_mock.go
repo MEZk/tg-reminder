@@ -29,6 +29,9 @@ var _ Storage = &StorageMock{}
 //			GetMyRemindersFunc: func(ctx context.Context, userID int64, chatID int64) ([]domain.Reminder, error) {
 //				panic("mock out the GetMyReminders method")
 //			},
+//			GetReminderByIDFunc: func(ctx context.Context, id int64) (domain.Reminder, error) {
+//				panic("mock out the GetReminderByID method")
+//			},
 //			RemoveReminderFunc: func(ctx context.Context, id int64) error {
 //				panic("mock out the RemoveReminder method")
 //			},
@@ -62,6 +65,9 @@ type StorageMock struct {
 
 	// GetMyRemindersFunc mocks the GetMyReminders method.
 	GetMyRemindersFunc func(ctx context.Context, userID int64, chatID int64) ([]domain.Reminder, error)
+
+	// GetReminderByIDFunc mocks the GetReminderByID method.
+	GetReminderByIDFunc func(ctx context.Context, id int64) (domain.Reminder, error)
 
 	// RemoveReminderFunc mocks the RemoveReminder method.
 	RemoveReminderFunc func(ctx context.Context, id int64) error
@@ -107,6 +113,13 @@ type StorageMock struct {
 			UserID int64
 			// ChatID is the chatID argument value.
 			ChatID int64
+		}
+		// GetReminderByID holds details about calls to the GetReminderByID method.
+		GetReminderByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID int64
 		}
 		// RemoveReminder holds details about calls to the RemoveReminder method.
 		RemoveReminder []struct {
@@ -158,6 +171,7 @@ type StorageMock struct {
 	lockDelayReminder     sync.RWMutex
 	lockGetBotState       sync.RWMutex
 	lockGetMyReminders    sync.RWMutex
+	lockGetReminderByID   sync.RWMutex
 	lockRemoveReminder    sync.RWMutex
 	lockSaveBotState      sync.RWMutex
 	lockSaveReminder      sync.RWMutex
@@ -301,6 +315,49 @@ func (mock *StorageMock) ResetGetMyRemindersCalls() {
 	mock.lockGetMyReminders.Lock()
 	mock.calls.GetMyReminders = nil
 	mock.lockGetMyReminders.Unlock()
+}
+
+// GetReminderByID calls GetReminderByIDFunc.
+func (mock *StorageMock) GetReminderByID(ctx context.Context, id int64) (domain.Reminder, error) {
+	if mock.GetReminderByIDFunc == nil {
+		panic("StorageMock.GetReminderByIDFunc: method is nil but Storage.GetReminderByID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  int64
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockGetReminderByID.Lock()
+	mock.calls.GetReminderByID = append(mock.calls.GetReminderByID, callInfo)
+	mock.lockGetReminderByID.Unlock()
+	return mock.GetReminderByIDFunc(ctx, id)
+}
+
+// GetReminderByIDCalls gets all the calls that were made to GetReminderByID.
+// Check the length with:
+//
+//	len(mockedStorage.GetReminderByIDCalls())
+func (mock *StorageMock) GetReminderByIDCalls() []struct {
+	Ctx context.Context
+	ID  int64
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  int64
+	}
+	mock.lockGetReminderByID.RLock()
+	calls = mock.calls.GetReminderByID
+	mock.lockGetReminderByID.RUnlock()
+	return calls
+}
+
+// ResetGetReminderByIDCalls reset all the calls that were made to GetReminderByID.
+func (mock *StorageMock) ResetGetReminderByIDCalls() {
+	mock.lockGetReminderByID.Lock()
+	mock.calls.GetReminderByID = nil
+	mock.lockGetReminderByID.Unlock()
 }
 
 // RemoveReminder calls RemoveReminderFunc.
@@ -582,6 +639,10 @@ func (mock *StorageMock) ResetCalls() {
 	mock.lockGetMyReminders.Lock()
 	mock.calls.GetMyReminders = nil
 	mock.lockGetMyReminders.Unlock()
+
+	mock.lockGetReminderByID.Lock()
+	mock.calls.GetReminderByID = nil
+	mock.lockGetReminderByID.Unlock()
 
 	mock.lockRemoveReminder.Lock()
 	mock.calls.RemoveReminder = nil

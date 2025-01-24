@@ -87,3 +87,36 @@ func (b *Bot) onRemoveReminderUserMessage(ctx context.Context, message domain.Tg
 
 	return b.responseSender.SendBotResponse(sender.BotResponse{ChatID: message.ChatID, Text: responseMsg})
 }
+
+func (b *Bot) onEditReminderUserMessage(ctx context.Context, message domain.TgMessage) error {
+	reminderID, err := strconv.ParseInt(message.Text, 10, 64)
+	if err != nil {
+		return fmt.Errorf("failed to parse reminder id %s: %w", message.Text, err)
+	}
+
+	remidner, err := b.store.GetReminderByID(ctx, reminderID)
+	if err != nil {
+		return fmt.Errorf("failed to get reminder by id %d: %w", reminderID, err)
+	}
+
+	if remidner.Status != domain.ReminderStatusPending {
+		return fmt.Errorf("can't edit reminder %d: forbidden status '%s'", reminderID, remidner.Status)
+	}
+
+	state, err := b.store.GetBotState(ctx, message.UserID)
+	if err != nil {
+		return fmt.Errorf("failed to get bot state: %w", err)
+	}
+
+	state.SetReminderID(reminderID)
+	state.Name = domain.BotStateNameEditReminderAskAction
+
+	if err = b.store.SaveBotState(ctx, state); err != nil {
+		return err
+	}
+
+	return b.responseSender.SendBotResponse(sender.BotResponse{
+		ChatID: message.ChatID,
+		Text:   "Выберите действие", // TODO: отобразить пользователю текст напоминания и предложить выбрать де2йствие для редактирования (Текст или Дата)
+	}, sender.WithReminderEditButtons())
+}

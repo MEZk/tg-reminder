@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -82,4 +83,14 @@ func (b *Bot) onEditReminderButton(ctx context.Context, callback domain.TgCallba
 		ChatID: callback.ChatID,
 		Text:   fmt.Sprintf("Напишите номер %s напоминания для редактирования.", domain.EmojiKeycapHash),
 	})
+}
+
+// TODO: implement me
+func (b *Bot) onEditReminderDateButton(ctx context.Context, callback domain.TgCallbackQuery) error {
+	return errors.ErrUnsupported
+}
+
+// TODO: implement me
+func (b *Bot) onEditReminderTextButton(ctx context.Context, callback domain.TgCallbackQuery) error {
+	return errors.ErrUnsupported
 }

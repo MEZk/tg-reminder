@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -201,4 +202,34 @@ func (s *Storage) DelayReminder(ctx context.Context, id int64, remindAt time.Tim
 	log.Printf("[INFO] delayed reminder [ID: %d, RemindAt: %s, AttemptsLeft: %d]", id, remindAt, domain.DefaultAttemptsLeft)
 
 	return nil
+}
+
+func (s *Storage) GetReminderByID(ctx context.Context, id int64) (domain.Reminder, error) {
+	const query = `
+		SELECT
+		    r.id
+			, r.chat_id
+			, r.user_id
+			, r.text
+			, r.created_at
+			, r.modified_at
+			, r.remind_at
+			, r.status
+			, r.attempts_left
+		FROM reminders r
+		WHERE r.id = $1;`
+
+	var reminder domain.Reminder
+	if err := s.db.GetContext(ctx, &reminder, query, id); err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return domain.Reminder{}, fmt.Errorf("failed to get reminder by id %d: %w", id, ErrBotStateNotFound)
+		default:
+			return domain.Reminder{}, fmt.Errorf("failed to get reminder by id %d: %w", id, err)
+		}
+	}
+
+	log.Printf("[DEBUG] got reminder by %s", reminder)
+
+	return reminder, nil
 }

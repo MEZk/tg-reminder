@@ -76,6 +76,8 @@ const (
 	BotStateNameCreateReminder BotStateName = "create_reminder"
 	// BotStateNameEditReminder - user clicked on reminder button .
 	BotStateNameEditReminder BotStateName = "edit_reminder"
+	// BotStateNameEditReminderAskAction - bot asks edti action.
+	BotStateNameEditReminderAskAction BotStateName = "edit_reminder_ask_action"
 	// BotStateNameRemoveReminder - user clicked on remode reminder button.
 	BotStateNameRemoveReminder BotStateName = "remove_reminder"
 	// BotStateNameMyReminders - user sent /my_remidners command.

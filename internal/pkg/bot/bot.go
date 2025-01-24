@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -13,6 +12,7 @@ import (
 
 // ResponseSender - bot's response sender.
 type ResponseSender interface {
+	// TODO: SendBotResponse должен возвращать ID сообщения, чтобы потом его можно было отредактировать
 	SendBotResponse(response sender.BotResponse, opts ...sender.BotResponseOption) error
 }
 
@@ -29,6 +29,7 @@ type Storage interface {
 	RemoveReminder(ctx context.Context, id int64) error
 	SetReminderStatus(ctx context.Context, id int64, status domain.ReminderStatus) error
 	DelayReminder(ctx context.Context, id int64, remindAt time.Time) error
+	GetReminderByID(ctx context.Context, id int64) (domain.Reminder, error)
 }
 
 // Bot - bot implementation.
@@ -75,8 +76,7 @@ func (b *Bot) OnMessage(ctx context.Context, message domain.TgMessage) error {
 	case domain.BotStateNameEnterReminAt:
 		return b.onEnterRemindAtUserMessage(ctx, message)
 	case domain.BotStateNameEditReminder:
-		// TODO: implement edit reminder feature
-		return errors.ErrUnsupported
+		return b.onEditReminderUserMessage(ctx, message)
 	case domain.BotStateNameRemoveReminder:
 		return b.onRemoveReminderUserMessage(ctx, message)
 	default:
@@ -98,6 +98,10 @@ func (b *Bot) OnCallbackQuery(ctx context.Context, callback domain.TgCallbackQue
 			return b.onDelayReminderButton(ctx, callback)
 		case strings.HasPrefix(callback.Data, domain.ButtonDataEditReminder):
 			return b.onEditReminderButton(ctx, callback)
+		case strings.HasPrefix(callback.Data, domain.ButtonDataEditReminderText):
+			return b.onEditReminderTextButton(ctx, callback)
+		case strings.HasPrefix(callback.Data, domain.ButtonDataEditReminderDate):
+			return b.onEditReminderDateButton(ctx, callback)
 		default:
 			return b.sendUnsupportedResponse(callback.ChatID)
 		}
