@@ -56,12 +56,36 @@ func (s *BotState) SetReminderText(text string) {
 }
 
 // ReminderText returns reminder text associated with current bot state.
-func (s BotState) ReminderText() string {
+func (s *BotState) ReminderText() string {
 	if s.Context == nil {
 		return ""
 	}
 
 	return s.Context.ReminderText
+}
+
+func (s *BotState) AppendPrevMessageID(id ...int) {
+	if s == nil {
+		return
+	}
+
+	if s.Context == nil {
+		s.Context = &BotStateContext{}
+	}
+
+	s.Context.PrevMessageIDs = append(s.Context.PrevMessageIDs, id...)
+}
+
+func (s *BotState) GetPrevMessageIDs() []int {
+	if s == nil {
+		return nil
+	}
+
+	if s.Context == nil {
+		return nil
+	}
+
+	return s.Context.PrevMessageIDs
 }
 
 // BotStateName is a name of bot state.
@@ -90,8 +114,9 @@ const (
 
 // BotStateContext is a metadata associated with c\urrent bot state.
 type BotStateContext struct {
-	ReminderID   int64  `json:"reminder_id,omitempty"`
-	ReminderText string `json:"reminder_text,omitempty"`
+	ReminderID     int64  `json:"reminder_id,omitempty"`
+	ReminderText   string `json:"reminder_text,omitempty"`
+	PrevMessageIDs []int  `json:"prev_message_ids,omitempty"`
 }
 
 // Scan implements [sql.Scanner].

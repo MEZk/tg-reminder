@@ -13,10 +13,7 @@ import (
 	log "github.com/go-pkgz/lgr"
 	tbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/jmoiron/sqlx"
-	"github.com/mezk/tg-reminder/internal/pkg/bot"
-	"github.com/mezk/tg-reminder/internal/pkg/listener"
-	"github.com/mezk/tg-reminder/internal/pkg/notifier"
-	"github.com/mezk/tg-reminder/internal/pkg/sender"
+	v2 "github.com/mezk/tg-reminder/internal/pkg/bot/v2"
 	"github.com/mezk/tg-reminder/internal/pkg/storage"
 	"github.com/mezk/tg-reminder/internal/pkg/storage/backuper"
 )
@@ -85,6 +82,11 @@ func execute() error {
 		return fmt.Errorf("failed to connect to sqlite %s: %v", dbFile, err)
 	}
 
+	bot, err := v2.New(store, tgAPIToken)
+	if err != nil {
+		return fmt.Errorf("can't create bot: %w", err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		// catch signal and invoke graceful termination
@@ -93,6 +95,7 @@ func execute() error {
 		<-stop
 		log.Printf("[WARN] interrupt signal")
 		cancel()
+		bot.Stop()
 	}()
 
 	if backupDir := os.Getenv(envBackupDir); backupDir != "" {
@@ -116,20 +119,16 @@ func execute() error {
 		}()
 	}
 
-	tgMessageSender := sender.New(botAPI)
-
-	reminderBot := bot.New(tgMessageSender, store)
-
-	tgUpdatesListener := listener.New(botAPI, reminderBot)
-
-	notificationSender := notifier.New(tgMessageSender, store, 1*time.Minute)
+	// notificationSender := notifier.New(tgMessageSender, store, 1*time.Minute)
 	// notifications sender starts in background goroutine
-	go func() {
-		notificationSender.Run(ctx)
-	}()
+	// go func() {
+	// 	notificationSender.Run(ctx)
+	// }()
 
-	// Listen is a blocking call
-	return tgUpdatesListener.Listen(ctx)
+	// Start is a blocking call
+	bot.Start()
+
+	return nil
 }
 
 func setupLog(dbg bool, secrets ...string) error {
