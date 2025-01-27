@@ -8,7 +8,6 @@ import (
 
 	log "github.com/go-pkgz/lgr"
 	"github.com/markusmobius/go-dateparser"
-	"github.com/markusmobius/go-dateparser/date"
 	"github.com/mezk/tg-reminder/internal/pkg/domain"
 	tele "gopkg.in/telebot.v4"
 )
@@ -42,8 +41,8 @@ var (
 	btn1mon = tele.Btn{Unique: "btn1mon", Text: "1 месяц", Data: "730h"}
 )
 
-var timeNowUTC = func() time.Time {
-	return time.Now().UTC()
+var timeNowMSK = func() time.Time {
+	return domain.MoscowTime(time.Now().UTC())
 }
 
 func (b *tgBot) onReminderTextReceived(ctx context.Context, c tele.Context, state domain.BotState) error {
@@ -65,7 +64,7 @@ func (b *tgBot) onReminderTextReceived(ctx context.Context, c tele.Context, stat
 • 2024-08-29 11:30
 
 Введите дату и время напоминания или выберите опцию ниже
-`, domain.MoscowTime(timeNowUTC()).Format("02.01.2006 15:04"))
+`, timeNowMSK().Format("02.01.2006 15:04"))
 
 	selector := tele.ReplyMarkup{}
 	selector.Inline(
@@ -98,7 +97,7 @@ func (b *tgBot) onReminderDateBtn(c tele.Context) error {
 		return nil
 	}
 
-	remindAt, err := getReminderDateFromButtonData(c.Data(), timeNowUTC())
+	remindAt, err := parseRemidnerDate(c.Data(), timeNowMSK(), false)
 	if err != nil {
 		return fmt.Errorf("failed to get reminder date for user %d from button data: %w", userID, err)
 	}
@@ -109,13 +108,13 @@ func (b *tgBot) onReminderDateBtn(c tele.Context) error {
 func (b *tgBot) onRemindDateReceived(ctx context.Context, c tele.Context, state domain.BotState) error {
 	userID := c.Sender().ID
 
-	reminderDate, err := getReminderDateFromUserMsg(c.Text(), timeNowUTC())
+	reminderDate, err := parseRemidnerDate(c.Text(), timeNowMSK(), true)
 	if err != nil {
 		log.Printf("[ERROR] can't get reminder date from user message: %v", err)
 		return c.Send("🤔 Не удалось понять время из запроса, пожалуйста, попытайтесь его изменить. Время должно быть в будущем.")
 	}
 
-	return b.createReminder(ctx, c, state, userID, reminderDate)
+	return b.createReminder(ctx, c, state, userID, reminderDate.UTC())
 }
 
 func (b *tgBot) createReminder(ctx context.Context, c tele.Context, state domain.BotState, userID int64, remindAt time.Time) error {
@@ -153,56 +152,28 @@ func (b *tgBot) createReminder(ctx context.Context, c tele.Context, state domain
 	return b.store.SaveBotState(ctx, state)
 }
 
-func getReminderDateFromButtonData(data string, now time.Time) (time.Time, error) {
-	nowMSK := domain.MoscowTime(now)
-
+func parseRemidnerDate(text string, now time.Time, isUserInput bool) (time.Time, error) {
 	var reminderDate time.Time
-	switch data {
-	case btn11_30.Data:
-		reminderDate = time.Date(nowMSK.Year(), nowMSK.Month(), nowMSK.Day(), 11, 30, 0, 0, nowMSK.Location())
-	case btn14_30.Data:
-		reminderDate = time.Date(nowMSK.Year(), nowMSK.Month(), nowMSK.Day(), 14, 30, 0, 0, nowMSK.Location())
-	case btn19_30.Data:
-		reminderDate = time.Date(nowMSK.Year(), nowMSK.Month(), nowMSK.Day(), 19, 30, 0, 0, nowMSK.Location())
-	case btn20_30.Data:
-		reminderDate = time.Date(nowMSK.Year(), nowMSK.Month(), nowMSK.Day(), 20, 30, 0, 0, nowMSK.Location())
-	case btn30m.Data:
-		reminderDate = nowMSK.Add(30 * time.Minute)
-	case btn80m.Data:
-		reminderDate = nowMSK.Add(30 * time.Minute)
-	case btn1day.Data:
-		reminderDate = nowMSK.Add(24 * time.Hour)
-	case btn1mon.Data:
-		reminderDate = nowMSK.AddDate(0, 1, 0)
-	default:
-		return time.Time{}, fmt.Errorf("unknown button data: %s", string(data))
-	}
 
-	if reminderDate.Before(nowMSK) {
-		reminderDate = reminderDate.AddDate(0, 0, 1)
-	}
-
-	return reminderDate.Truncate(1 * time.Minute).UTC(), nil
-}
-
-func getReminderDateFromUserMsg(msg string, now time.Time) (time.Time, error) {
-	now = domain.MoscowTime(now)
-
-	remindAt, err := time.ParseInLocation(domain.LayoutRemindAt, msg, now.Location())
-	if err != nil {
-		log.Printf("[DEBUG] can't parse (time.ParseInLocation) remindAt %s: %s\n", msg, err)
-
-		var remindAtDate date.Date
-		if remindAtDate, err = dateparser.Parse(&dateparser.Configuration{ // TODO: здесь в БД записывается неверная дата
+	if isUserInput || strings.Contains(text, ":") {
+		date, err := dateparser.Parse(&dateparser.Configuration{
 			CurrentTime:         now,
 			Locales:             []string{"ru"},
 			PreferredDateSource: dateparser.Future,
-		}, msg); err != nil {
+		}, text, "2006-01-02 15:04")
+		if err != nil {
 			return time.Time{}, err
 		}
 
-		remindAt = remindAtDate.Time
+		reminderDate = date.Time
+	} else {
+		d, err := time.ParseDuration(text)
+		if err != nil {
+			return time.Time{}, err
+		}
+
+		reminderDate = now.Add(d)
 	}
 
-	return remindAt.Truncate(1 * time.Minute), nil
+	return reminderDate, nil
 }
