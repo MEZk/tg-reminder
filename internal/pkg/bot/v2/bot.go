@@ -25,6 +25,7 @@ type Storage interface {
 	SaveUser(ctx context.Context, user domain.User) error
 
 	SaveReminder(ctx context.Context, reminder domain.Reminder) (int64, error)
+	GetMyReminders(ctx context.Context, userID, chatID int64) ([]domain.Reminder, error)
 }
 
 type tgBot struct {
