@@ -42,7 +42,7 @@ jobs:
           TZ: "UTC"
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: v1.63.4
           args: --config=.golangci.yml --sort-results --max-issues-per-linter=1000 --max-same-issues=1000 ./...
